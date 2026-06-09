@@ -26,6 +26,7 @@ const FOOTER_LINKS = [
       { label: "GitHub", href: "https://github.com/atelier-runtime/atelier" },
       { label: "Issues", href: "https://github.com/atelier-runtime/atelier/issues" },
       { label: "Discussions", href: "https://github.com/atelier-runtime/atelier/discussions" },
+      { label: "Contact", href: "mailto:contact@atelier.ws" },
       { label: "Blog", href: "https://atelier.beseam.com/blog" },
     ],
   },
