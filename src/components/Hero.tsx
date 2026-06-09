@@ -5,9 +5,9 @@ export default function Hero() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-20 pb-24">
       {/* Background gradient orbs */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="glow-purple absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 md:h-[700px] md:w-[700px]" />
-        <div className="glow-cyan absolute -bottom-40 right-0 h-[400px] w-[400px]" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="glow-purple absolute -top-40 left-1/2 h-[300px] w-[300px] -translate-x-1/2 sm:h-[500px] sm:w-[500px] md:h-[700px] md:w-[700px]" />
+        <div className="glow-cyan absolute -bottom-40 right-0 h-[250px] w-[250px] sm:h-[400px] sm:w-[400px]" />
       </div>
 
       {/* Grid overlay */}
@@ -24,7 +24,7 @@ export default function Hero() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl font-bold leading-tight tracking-tight text-neutral-100 md:text-6xl md:leading-[1.1]">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight text-neutral-100 sm:text-4xl md:text-6xl md:leading-[1.1]">
           Runtime Engineering
           <br />
           <span className="bg-gradient-to-r from-brand-300 via-brand-400 to-purple-400 bg-clip-text text-transparent">
@@ -41,41 +41,41 @@ MCP server + SDK middleware that gives every agent shared
         </p>
 
         {/* CTA buttons */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
           <a
             href="#install"
-            className="inline-flex items-center gap-2 border border-brand/60 bg-brand/10 px-6 py-3 text-sm font-bold uppercase tracking-widest text-brand-300 no-underline transition hover:bg-brand/20"
+            className="inline-flex w-full items-center justify-center gap-2 border border-brand/60 bg-brand/10 px-6 py-3 text-sm font-bold uppercase tracking-widest text-brand-300 no-underline transition hover:bg-brand/20 sm:w-auto"
           >
             Install
             <ArrowRight size={16} />
           </a>
           <a
             href="https://github.com/atelier-runtime/atelier"
-            className="inline-flex items-center gap-2 border border-neutral-700 px-6 py-3 text-sm font-bold uppercase tracking-widest text-neutral-300 no-underline transition hover:border-neutral-500 hover:text-neutral-100"
+            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-700 px-6 py-3 text-sm font-bold uppercase tracking-widest text-neutral-300 no-underline transition hover:border-neutral-500 hover:text-neutral-100 sm:w-auto"
           >
             <GitHubIcon size={16} />
             GitHub
           </a>
           <a
             href="https://atelier.beseam.com/docs/installation"
-            className="inline-flex items-center gap-2 border border-neutral-800 px-6 py-3 text-sm uppercase tracking-widest text-neutral-500 no-underline transition hover:border-neutral-600 hover:text-neutral-300"
+            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-800 px-6 py-3 text-sm uppercase tracking-widest text-neutral-500 no-underline transition hover:border-neutral-600 hover:text-neutral-300 sm:w-auto"
           >
             Documentation
           </a>
         </div>
 
         {/* Animated terminal preview */}
-        <div className="mt-16 w-full max-w-2xl">
+        <div className="mt-12 w-full max-w-2xl sm:mt-16">
           <div className="border border-neutral-800 bg-neutral-950/80">
-            <div className="flex items-center gap-2 border-b border-neutral-800 px-4 py-2.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
+            <div className="flex items-center gap-2 border-b border-neutral-800 px-3 py-2 sm:px-4 sm:py-2.5">
+              <span className="h-2 w-2 rounded-full bg-red-500/70 sm:h-2.5 sm:w-2.5" />
+              <span className="h-2 w-2 rounded-full bg-amber-500/70 sm:h-2.5 sm:w-2.5" />
+              <span className="h-2 w-2 rounded-full bg-emerald-500/70 sm:h-2.5 sm:w-2.5" />
               <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-600">
                 Terminal
               </span>
             </div>
-            <pre className="overflow-x-auto border-0 bg-transparent p-5 text-xs leading-relaxed text-neutral-300 md:text-sm">
+            <pre className="overflow-x-auto border-0 bg-transparent p-3 text-[10px] leading-relaxed text-neutral-300 sm:p-5 sm:text-xs md:text-sm">
               <span className="text-emerald-400">$</span>{" "}
               <span className="text-neutral-100">curl -fsSL</span> https://raw.githubusercontent.com/atelier-runtime/atelier/main/scripts/install.sh
               <br />
