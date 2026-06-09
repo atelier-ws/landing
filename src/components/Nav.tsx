@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
 
@@ -10,22 +10,11 @@ const NAV_LINKS = [
 ];
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-neutral-800 bg-neutral-950/90 backdrop-blur-md"
-          : "bg-transparent"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-800 bg-neutral-950/90 backdrop-blur-md transition-all duration-300"
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
