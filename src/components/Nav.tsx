@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
+import GitHubStars from "./GitHubStars";
 
 const NAV_LINKS = [
-  { label: "Savings", href: "#savings" },
+  { label: "How it works", href: "#savings" },
+  { label: "Benchmark", href: "#benchmark" },
   { label: "Hosts", href: "#hosts" },
   { label: "Docs", href: "https://docs.atelier.ws/installation" },
-  { label: "Blog", href: "https://atelier.ws/blog" },
 ];
 
 export default function Nav() {
@@ -37,6 +38,7 @@ export default function Nav() {
             </a>
           ))}
           <div className="flex items-center gap-3">
+            <GitHubStars />
             <a
               href="https://github.com/atelier-runtime/atelier"
               className="text-neutral-400 transition hover:text-neutral-200"

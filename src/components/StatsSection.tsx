@@ -1,12 +1,12 @@
 import { FileCode, Server, BarChart3, FileDown, Crosshair, Shield } from "lucide-react";
 
 const STATS = [
-  { icon: FileCode, value: "18+", label: "Languages", detail: "Code intelligence & outlining" },
-  { icon: Server, value: "10+", label: "Agent Hosts", detail: "MCP & SDK integrations" },
-  { icon: BarChart3, value: "13", label: "Savings Mechanisms", detail: "Token & cost reduction" },
-  { icon: FileDown, value: "85%", label: "Read Compression", detail: "On large source files" },
-  { icon: Crosshair, value: "100×", label: "Symbol Lookup", detail: "Fewer tokens vs. text search" },
-  { icon: Shield, value: "MIT", label: "License", detail: "Open source, free to use" },
+  { icon: FileDown, value: "50–90%", label: "Read compression", detail: "outline / range on large source files" },
+  { icon: Crosshair, value: "2.2×", label: "Fewer search tokens", detail: "code-index-mcp, exact lookups; full table below" },
+  { icon: Server, value: "10+", label: "Agent hosts", detail: "MCP & SDK integrations" },
+  { icon: FileCode, value: "18+", label: "Languages", detail: "SCIP code intelligence & outlining" },
+  { icon: BarChart3, value: "$0", label: "Unpriced models", detail: "shown as $0 until a rate is known" },
+  { icon: Shield, value: "Apache-2.0", label: "License", detail: "open source, self-hosted" },
 ];
 
 export default function StatsSection() {
@@ -15,10 +15,10 @@ export default function StatsSection() {
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-neutral-100 md:text-3xl">
-            Built for Scale
+            Measured savings
           </h2>
           <p className="mt-3 text-sm text-neutral-400">
-            Atelier's measurement-driven approach means every saving is observable.
+            Every number here comes from the run ledger, with the method a click away.
           </p>
         </div>
 

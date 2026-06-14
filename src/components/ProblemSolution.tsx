@@ -14,14 +14,14 @@ export default function ProblemSolution() {
               The Problem
             </div>
             <h2 className="mt-3 text-xl font-bold text-neutral-100 md:text-2xl">
-              Every agent starts from scratch
+              Agents burn tokens they never use
             </h2>
             <ul className="mt-6 space-y-4">
               {[
-                "Agents rediscover the same procedures on every task — no shared memory between sessions.",
-                "Failure patterns repeat across agents and teams, burning context budget on the same debugging cycles.",
-                "Model costs compound from redundant reads, repeated searches, and thrashing loops that quietly drain budget.",
-                "Each agent host (Claude Code, Codex, Copilot, Gemini) has its own tooling and context format — no portable runtime.",
+                "An agent reads a whole file to find one symbol. Most of those tokens go unused.",
+                "The same file gets read again and again, at full cost each time.",
+                "Answers come over many small turns.",
+                "Context grows quietly, with no signal until the session is expensive.",
               ].map((text) => (
                 <li key={text} className="flex gap-3 text-sm leading-relaxed text-neutral-400">
                   <span className="mt-0.5 shrink-0 text-red-400/60">✗</span>
@@ -40,14 +40,14 @@ export default function ProblemSolution() {
               The Solution
             </div>
             <h2 className="mt-3 text-xl font-bold text-neutral-100 md:text-2xl">
-                    Atelier changes the equation
+              A leaner context window
             </h2>
             <ul className="mt-6 space-y-4">
               {[
-                "Reusable procedures from past sessions give agents context hits instead of cold reads — every shared procedure is one less round of exploration.",
-                "Failure Rescue surfaces targeted procedures the moment a known error pattern reappears — no retry loops.",
-                "Outline-mode reads, cached searches, and batch edits compress token usage by up to 85% on large files.",
-                "One MCP runtime works across every major agent host with cross-vendor model routing and cost tracking built in.",
+                "Code intelligence returns the exact symbol, caller, or range.",
+                "Projection and dedup send an outline or a range, and turn repeat reads into a pointer.",
+                "Batch calls and cross-file edits land the work in a single turn.",
+                "Every saved token and round-trip is recorded in the CLI, statusline, and dashboard.",
               ].map((text) => (
                 <li key={text} className="flex gap-3 text-sm leading-relaxed text-neutral-400">
                   <span className="mt-0.5 shrink-0 text-emerald-400/80">✓</span>

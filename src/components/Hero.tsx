@@ -19,24 +19,24 @@ export default function Hero() {
         <div className="mb-6 inline-flex items-center gap-2 rounded border border-brand/30 bg-brand/5 px-3 py-1.5">
           <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-300">
-            Open source
+            Open source · Apache-2.0
           </span>
         </div>
 
         {/* Headline */}
         <h1 className="w-full text-3xl font-bold leading-tight tracking-tight text-neutral-100 sm:text-4xl md:text-6xl md:leading-[1.1]">
-          Runtime Engineering
+          Cut what your coding
           <br />
           <span className="bg-gradient-to-r from-brand-300 via-brand-400 to-purple-400 bg-clip-text text-transparent">
-            for Agents
+            agent spends
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-6 w-full max-w-2xl text-sm leading-relaxed text-neutral-400 md:text-base md:leading-relaxed">
-          Open source context runtime for coding agents. Reuses context, detects
-          loops, tracks costs, and supervises tools across every major agent
-          host.
+          Atelier trims what your coding agent sends to the model, and how
+          often it asks. Source projection, dedup, code intelligence, and batch
+          edits, measured on every call.
         </p>
 
         {/* CTA buttons */}
@@ -49,17 +49,17 @@ export default function Hero() {
             <ArrowRight size={16} />
           </a>
           <a
-            href="https://github.com/atelier-runtime/atelier"
+            href="#benchmark"
             className="inline-flex w-full items-center justify-center gap-2 border border-neutral-700 px-6 py-3 text-sm font-bold uppercase tracking-widest text-neutral-300 no-underline transition hover:border-neutral-500 hover:text-neutral-100 sm:w-auto"
+          >
+            See the benchmark
+          </a>
+          <a
+            href="https://github.com/atelier-runtime/atelier"
+            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-800 px-6 py-3 text-sm uppercase tracking-widest text-neutral-500 no-underline transition hover:border-neutral-600 hover:text-neutral-300 sm:w-auto"
           >
             <GitHubIcon size={16} />
             GitHub
-          </a>
-          <a
-            href="https://docs.atelier.ws/installation"
-            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-800 px-6 py-3 text-sm uppercase tracking-widest text-neutral-500 no-underline transition hover:border-neutral-600 hover:text-neutral-300 sm:w-auto"
-          >
-            Documentation
           </a>
         </div>
 
@@ -77,36 +77,18 @@ export default function Hero() {
             <pre className="overflow-x-auto border-0 bg-transparent p-3 text-[10px] leading-relaxed text-neutral-300 sm:p-5 sm:text-xs md:text-sm">
               <span className="text-emerald-400">$</span>{" "}
               <span className="text-neutral-100">curl -fsSL</span>{" "}
-              https://install.atelier.ws
+              https://install.atelier.ws | bash
               <br />
-              <span className="text-neutral-500">
-                {" "}
-                → installing atelier (CLI)
-              </span>
+              <span className="text-neutral-500"> → installing atelier (CLI + MCP + service)</span>
               <br />
-              <span className="text-neutral-500">
-                {" "}
-                → installing atelierd (background service)
-              </span>
+              <span className="text-neutral-500"> → wiring into your agent host…</span>
               <br />
-              <span className="text-neutral-500">
-                {" "}
-                → installing atelier-mcp (MCP server)
-              </span>
-              <br />
-              <span className="text-neutral-500">
-                {" "}
-                → initializing runtime store...
-              </span>
-              <br />
-              <span className="mt-1 inline-block text-emerald-400">
-                ✓ Atelier ready
-              </span>
+              <span className="mt-1 inline-block text-emerald-400">✓ Atelier ready — savings now tracked per call</span>
               <br />
               <span className="text-emerald-400">$</span>{" "}
               <span className="text-neutral-100">atelier --version</span>
               <br />
-              <span className="text-cyan-300">0.2.0</span>
+              <span className="text-cyan-300">0.3.2</span>
             </pre>
           </div>
         </div>

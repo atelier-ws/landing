@@ -1,37 +1,20 @@
-import { Sparkles, Repeat, ShieldCheck, Route } from "lucide-react";
+import { Scissors, Copy, Network, GitMerge } from "lucide-react";
 
-const CATEGORIES = [
+const SATELLITES = [
   {
-    icon: Repeat,
-    title: "Context Reuse",
-    description:
-      "Reuse procedures across sessions so agents don't rediscover the same patterns. Every cache hit is a cold read avoided.",
-    savings: "Avoids 1–3 rounds of exploration per repeat task",
-    badge: "−3 rounds",
+    icon: Copy,
+    title: "Dedup and delta re-reads",
+    body: "Read a file twice and the second read is a pointer. Re-read after an edit and you get the diff. The same bytes stay out of context.",
   },
   {
-    icon: Sparkles,
-    title: "Smarter Tool Use",
-    description:
-      "Outline-mode reads, cached searches, batch edits with rollback, and token-budgeted results — fewer redundant tool calls.",
-    savings: "Read compression up to 85% on large files",
-    badge: "−85% tokens",
+    icon: Network,
+    title: "Code intelligence",
+    body: "SCIP-indexed lookups return the exact symbol, caller, or reference, with the snippet inline.",
   },
   {
-    icon: ShieldCheck,
-    title: "Failure Prevention",
-    description:
-      "Detect thrashing loops, rescue from known error patterns, and surface fixes before the agent burns context budget.",
-    savings: "Eliminates duplicate debugging cycles",
-    badge: "−retries",
-  },
-  {
-    icon: Route,
-    title: "Model Optimization",
-    description:
-      "Route each task to the right model — cheap for lookups, capable for complex work — across every major vendor.",
-    savings: "Simple work to cheap models, hard work to capable ones",
-    badge: "−cost",
+    icon: GitMerge,
+    title: "Batch edits",
+    body: "Edit across many files in one call. Every round-trip you skip is a full context read you keep.",
   },
 ];
 
@@ -45,56 +28,69 @@ export default function SavingsStack() {
       <div className="relative z-10 mx-auto max-w-5xl">
         <div className="text-center">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400/70">
-            Cost Savings
+            How it cuts cost
           </div>
           <h2 className="mt-3 text-2xl font-bold text-neutral-100 md:text-3xl">
-            How Atelier Saves LLM Cost
+            Four levers, measured on every call
           </h2>
           <p className="mt-3 text-sm text-neutral-400">
-            Atelier reduces token spend at every layer of the agent loop —
-            context loading, tool calls, model selection, and recovery.
+            Atelier reduces how many tokens and round-trips reach the model, and records every one.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-2">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={cat.title}
-                className="group border border-neutral-800 bg-neutral-950/40 p-6 transition hover:border-neutral-600"
-              >
-                <div className="flex items-start gap-4">
-                  <Icon size={24} className="mt-0.5 shrink-0 text-brand-400" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-bold text-neutral-100">
-                        {cat.title}
-                      </h3>
-                      <span className="shrink-0 rounded border border-emerald-400/30 bg-emerald-400/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400/90">
-                        {cat.badge}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-xs leading-relaxed text-neutral-400">
-                      {cat.description}
-                    </p>
-                  </div>
+        {/* Bento: one dominant lever + three satellites */}
+        <div className="mt-12 space-y-4">
+          {/* Dominant card — source projection (the 90% lever) */}
+          <div className="relative overflow-hidden border border-brand/30 bg-gradient-to-br from-brand/[0.08] to-transparent p-6 md:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="max-w-xl">
+                <Scissors size={26} className="text-brand-300" />
+                <h3 className="mt-3 text-lg font-bold text-neutral-100">Source projection</h3>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-300">
+                  <code className="text-brand-300">read</code> returns an outline, an exact line range, or a
+                  minified view. The model sees the shape of the file first, and expands only the parts it
+                  needs.
+                </p>
+              </div>
+              <div className="shrink-0 text-left sm:text-right">
+                <div className="bg-gradient-to-r from-brand-200 to-brand-400 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
+                  50–90%
+                </div>
+                <div className="mt-1 text-[10px] uppercase tracking-wider text-neutral-500">
+                  fewer tokens, large files
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Satellites */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {SATELLITES.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.title}
+                  className="group border border-neutral-800 bg-neutral-950/40 p-6 transition hover:border-neutral-600"
+                >
+                  <Icon size={22} className="text-brand-400" />
+                  <h3 className="mt-3 text-sm font-bold text-neutral-100">{s.title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-neutral-400">{s.body}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="mt-8 border border-neutral-800 bg-neutral-950/40 p-5 text-center">
+        <div className="mt-8 text-center">
           <p className="text-xs leading-relaxed text-neutral-500">
-            All savings are recorded into the run ledger and visible in the CLI,
-            MCP, and dashboard.
+            Every saving is written to the run ledger and priced at the model&apos;s real input rate.
+            Unknown prices read as $0.
             <br />
             <a
               href="https://docs.atelier.ws"
               className="text-brand-300 no-underline transition hover:text-brand-200"
             >
-              See the full savings breakdown in the docs →
+              How savings are measured →
             </a>
           </p>
         </div>

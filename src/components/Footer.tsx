@@ -90,7 +90,7 @@ export default function Footer() {
               >
                 <GitHubIcon size={19} />
               </a>
-              <span className="text-[10px] text-neutral-600">MIT License</span>
+              <span className="text-[10px] text-neutral-600">Apache-2.0</span>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export default function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 text-xs text-neutral-600 md:flex-row">
             <span>
               &copy; {new Date().getFullYear()} Atelier. Open source under the
-              MIT License.
+              Apache-2.0 License.
             </span>
             <span className="inline-flex items-center gap-1">
               Built with <Heart size={10} className="text-red-400" /> for agents
