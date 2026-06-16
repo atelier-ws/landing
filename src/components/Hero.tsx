@@ -1,7 +1,70 @@
 import { ArrowRight } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
+import { useState, useEffect } from "react";
+
+const PHRASES = ["Open-source agent runtime", "Apache 2.0"];
+const TYPING_MS = 45;
+const DELETING_MS = 30;
+const PAUSE_MS = 2000;
+const EMPTY_PAUSE_MS = 400;
+
+type Phase = "typing" | "deleting";
+
+function usePrefersReducedMotion() {
+  const [prefersReduced, setPrefersReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return prefersReduced;
+}
 
 export default function Hero() {
+  const reducedMotion = usePrefersReducedMotion();
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [displayed, setDisplayed] = useState(
+    reducedMotion ? PHRASES[0] : "",
+  );
+  const [phase, setPhase] = useState<Phase>(
+    reducedMotion ? "typing" : "typing",
+  );
+
+  const target = PHRASES[phraseIndex];
+
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    let t: ReturnType<typeof setTimeout>;
+
+    if (phase === "typing") {
+      if (displayed.length < target.length) {
+        t = setTimeout(
+          () => setDisplayed(target.slice(0, displayed.length + 1)),
+          TYPING_MS,
+        );
+      } else {
+        t = setTimeout(() => setPhase("deleting"), PAUSE_MS);
+      }
+    } else {
+      if (displayed.length > 0) {
+        t = setTimeout(
+          () => setDisplayed(displayed.slice(0, -1)),
+          DELETING_MS,
+        );
+      } else {
+        t = setTimeout(() => {
+          setPhraseIndex((i) => (i + 1) % PHRASES.length);
+          setPhase("typing");
+        }, EMPTY_PAUSE_MS);
+      }
+    }
+
+    return () => clearTimeout(t);
+  }, [displayed, phase, target, reducedMotion]);
+
   return (
     <section className="relative overflow-hidden border-b border-neutral-200 bg-[#f7f8fb] px-6 pt-24 pb-16 text-neutral-950 sm:pt-28 md:pt-32">
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-80" />
@@ -9,7 +72,10 @@ export default function Hero() {
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <div className="mb-6 inline-flex border border-neutral-300 bg-white/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-700">
-            Open-source agent runtime
+            <span>{displayed}</span>
+            {!reducedMotion && (
+              <span className="typing-cursor ml-px">|</span>
+            )}
           </div>
 
           <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-5xl md:text-6xl md:leading-[1.06]">
@@ -36,7 +102,7 @@ export default function Hero() {
               Read docs
             </a>
             <a
-              href="https://github.com/atelier-runtime/atelier"
+              href="https://github.com/atelier-ws/atelier"
               className="inline-flex w-full items-center justify-center gap-2 border border-neutral-300 px-6 py-3 text-sm uppercase tracking-widest text-neutral-600 no-underline transition hover:border-neutral-950 hover:text-neutral-950 sm:w-auto"
             >
               <GitHubIcon size={16} />

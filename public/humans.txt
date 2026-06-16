@@ -1,0 +1,10 @@
+/* TEAM */
+Product: Atelier
+Site: https://atelier.ws/
+Contact: contact@atelier.ws
+
+/* PROJECT */
+Description: Open-source context runtime for coding agents.
+Source: https://github.com/atelier-ws/atelier
+Docs: https://docs.atelier.ws/
+License: Apache-2.0

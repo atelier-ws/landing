@@ -1,6 +1,6 @@
 # atelier-landing
 
-Marketing and documentation landing page for [Atelier](https://github.com/atelier-runtime/atelier) — the open-source runtime engineering platform for AI agents.
+Marketing and documentation landing page for [Atelier](https://github.com/atelier-ws/atelier) — the open-source runtime engineering platform for AI agents.
 
 Built with [Astro](https://astro.build) + React + Tailwind CSS.
 

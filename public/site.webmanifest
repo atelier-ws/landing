@@ -1,0 +1,17 @@
+{
+  "name": "Atelier",
+  "short_name": "Atelier",
+  "description": "Open-source runtime for coding agents with MCP, code intelligence, routing, cost tracking, and auditable traces.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fb",
+  "theme_color": "#f7f8fb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

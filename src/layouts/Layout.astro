@@ -1,10 +1,78 @@
 ---
 import "../styles/global.css";
+
 interface Props {
   title?: string;
   description?: string;
+  canonicalPath?: string;
+  image?: string;
 }
-  const { title = "Atelier — a runtime for coding agents", description = "Atelier hosts and orchestrates coding-agent runs: context reads, batch edits, model routing, tool calls, and trace. Open source, Apache-2.0." } = Astro.props;
+
+const SITE_URL = "https://atelier.ws";
+const SITE_NAME = "Atelier";
+const DEFAULT_TITLE = "Atelier - Open-Source Context Runtime for Coding Agents";
+const DEFAULT_DESCRIPTION =
+  "Atelier is an open-source runtime for coding agents: MCP server and SDK middleware for code intelligence, routing, cost tracking, and auditable traces.";
+
+const {
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  canonicalPath = "/",
+  image = "/og.png",
+} = Astro.props;
+
+const canonicalUrl = new URL(canonicalPath, SITE_URL).toString();
+const imageUrl = new URL(image, SITE_URL).toString();
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/favicon.svg`,
+      email: "contact@atelier.ws",
+      sameAs: ["https://github.com/atelier-ws/atelier"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      inLanguage: "en",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#software`,
+      name: SITE_NAME,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: ["Linux", "macOS"],
+      url: `${SITE_URL}/`,
+      downloadUrl: "https://install.atelier.ws",
+      codeRepository: "https://github.com/atelier-ws/atelier",
+      license: "https://www.apache.org/licenses/LICENSE-2.0",
+      isAccessibleForFree: true,
+      description,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      featureList: [
+        "MCP server for coding-agent hosts",
+        "SDK middleware for AI agent runtimes",
+        "SCIP-indexed code intelligence",
+        "Context reuse and compaction",
+        "Model routing and cost tracking",
+        "Auditable run traces",
+      ],
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -13,14 +81,35 @@ interface Props {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="author" content="Atelier" />
+    <meta name="application-name" content="Atelier" />
     <meta name="theme-color" content="#f7f8fb" />
+    <meta name="keywords" content="Atelier, coding agents, MCP server, AI agent runtime, code intelligence, model routing, cost tracking, context engineering" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" type="text/markdown" href="/index.md" title="Atelier landing page in Markdown" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Atelier LLM-readable summary" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link rel="me" href="https://github.com/atelier-ws/atelier" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Atelier" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Atelier - open-source context runtime for coding agents" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content="Atelier - open-source context runtime for coding agents" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body class="bg-[#f7f8fb] text-neutral-950 font-mono antialiased">
     <slot />

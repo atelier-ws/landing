@@ -10,9 +10,11 @@ import Footer from "../components/Footer";
 
 <Layout>
   <Nav client:load />
-  <div data-reveal><Hero client:load /></div>
-  <ContextMarquee client:load />
-  <div data-reveal><TerminalDemo client:load /></div>
-  <div data-reveal><InstallCmd client:load /></div>
+  <main id="main-content">
+    <div data-reveal><Hero client:load /></div>
+    <ContextMarquee client:load />
+    <div data-reveal><TerminalDemo client:load /></div>
+    <div data-reveal><InstallCmd client:load /></div>
+  </main>
   <Footer client:load />
 </Layout>

@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-[#f7f8fb] px-6 py-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 text-xs text-neutral-500 md:flex-row md:items-center md:justify-between">
-        <a href="#" className="flex items-center gap-2.5 no-underline">
+        <a href="/" className="flex items-center gap-2.5 no-underline">
           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-neutral-950 text-lg font-bold text-white">
             ❯
           </span>
@@ -21,7 +21,7 @@ export default function Footer() {
             Docs
           </a>
           <a
-            href="https://github.com/atelier-runtime/atelier"
+            href="https://github.com/atelier-ws/atelier"
             className="inline-flex items-center gap-1.5 text-neutral-600 no-underline transition hover:text-neutral-950"
           >
             <GitHubIcon size={14} />

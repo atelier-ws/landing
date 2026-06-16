@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Atelier - open-source context runtime for coding agents</title>
+  <desc id="desc">A light grid preview image with the Atelier name, install command, and product positioning.</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#d8dbe4" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.72" />
+  <rect x="72" y="72" width="1056" height="486" fill="#ffffff" stroke="#d4d4d8" stroke-width="2" />
+  <text x="112" y="150" fill="#9b75d9" font-family="monospace" font-size="42" font-weight="700">&gt;</text>
+  <text x="168" y="150" fill="#18181b" font-family="monospace" font-size="42" font-weight="700" letter-spacing="6">ATELIER</text>
+  <text x="112" y="255" fill="#18181b" font-family="monospace" font-size="56" font-weight="700">Own the runtime</text>
+  <text x="112" y="322" fill="#18181b" font-family="monospace" font-size="56" font-weight="700">for coding agents.</text>
+  <text x="112" y="392" fill="#52525b" font-family="monospace" font-size="28">MCP server + SDK middleware for code intelligence,</text>
+  <text x="112" y="432" fill="#52525b" font-family="monospace" font-size="28">routing, cost tracking, and auditable traces.</text>
+  <rect x="112" y="480" width="690" height="48" fill="#18181b" />
+  <text x="136" y="512" fill="#f7f8fb" font-family="monospace" font-size="23">curl -fsSL https://install.atelier.ws | bash</text>
+  <text x="112" y="553" fill="#6a39b3" font-family="monospace" font-size="20" font-weight="700">https://atelier.ws</text>
+</svg>

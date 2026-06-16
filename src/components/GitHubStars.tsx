@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 
-const REPO = "atelier-runtime/atelier";
+const REPO = "atelier-ws/atelier";
 
 // Honest social proof: fetches the REAL star count client-side. Renders nothing
 // until a real number loads — and nothing at all if the repo is private or

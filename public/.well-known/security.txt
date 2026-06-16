@@ -1,0 +1,4 @@
+Contact: mailto:contact@atelier.ws
+Preferred-Languages: en
+Canonical: https://atelier.ws/.well-known/security.txt
+Expires: 2027-06-16T00:00:00Z

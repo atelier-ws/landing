@@ -14,7 +14,7 @@ export default function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-[#f7f8fb]/90 backdrop-blur-md transition-all duration-300">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2.5 no-underline">
+        <a href="/" className="flex items-center gap-2.5 no-underline">
           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-neutral-950 text-lg font-bold text-white">
             ❯
           </span>
@@ -37,7 +37,7 @@ export default function Nav() {
           <div className="flex items-center gap-3">
             <GitHubStars />
             <a
-              href="https://github.com/atelier-runtime/atelier"
+              href="https://github.com/atelier-ws/atelier"
               className="text-neutral-600 transition hover:text-neutral-950"
               aria-label="GitHub"
             >
@@ -84,7 +84,7 @@ export default function Nav() {
             ))}
             <div className="mt-2 flex items-center gap-3 border-t border-neutral-200 pt-3">
               <a
-                href="https://github.com/atelier-runtime/atelier"
+                href="https://github.com/atelier-ws/atelier"
                 className="text-neutral-600 transition hover:text-neutral-950"
                 aria-label="GitHub"
               >
