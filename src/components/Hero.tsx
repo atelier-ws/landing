@@ -10,6 +10,18 @@ const EMPTY_PAUSE_MS = 400;
 
 type Phase = "typing" | "deleting";
 
+type PublicMetrics = {
+  saved_usd: number;
+  tokens_saved: number;
+  calls_avoided: number;
+};
+
+const FALLBACK_METRICS: PublicMetrics = {
+  saved_usd: 0.16,
+  tokens_saved: 9200,
+  calls_avoided: 8,
+};
+
 function usePrefersReducedMotion() {
   const [prefersReduced, setPrefersReduced] = useState(false);
   useEffect(() => {
@@ -24,6 +36,7 @@ function usePrefersReducedMotion() {
 
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
+  const [metrics, setMetrics] = useState<PublicMetrics>(FALLBACK_METRICS);
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [displayed, setDisplayed] = useState(reducedMotion ? PHRASES[0] : "");
   const [phase, setPhase] = useState<Phase>(
@@ -33,7 +46,24 @@ export default function Hero() {
   const target = PHRASES[phraseIndex];
 
   useEffect(() => {
-    if (reducedMotion) return;
+    const controller = new AbortController();
+    fetch("/api/public-metrics", { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        const nextMetrics = normalizeMetrics(payload);
+        if (nextMetrics) setMetrics(nextMetrics);
+      })
+      .catch(() => {
+        // Keep the static fallback when the Cloudflare binding is not configured.
+      });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setDisplayed(PHRASES[0]);
+      return;
+    }
 
     let t: ReturnType<typeof setTimeout>;
 
@@ -46,15 +76,13 @@ export default function Hero() {
       } else {
         t = setTimeout(() => setPhase("deleting"), PAUSE_MS);
       }
+    } else if (displayed.length > 0) {
+      t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), DELETING_MS);
     } else {
-      if (displayed.length > 0) {
-        t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), DELETING_MS);
-      } else {
-        t = setTimeout(() => {
-          setPhraseIndex((i) => (i + 1) % PHRASES.length);
-          setPhase("typing");
-        }, EMPTY_PAUSE_MS);
-      }
+      t = setTimeout(() => {
+        setPhraseIndex((i) => (i + 1) % PHRASES.length);
+        setPhase("typing");
+      }, EMPTY_PAUSE_MS);
     }
 
     return () => clearTimeout(t);
@@ -66,8 +94,8 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-700">
-            ❯<span>{displayed}</span>
+          <div className="mb-6 inline-flex max-w-full items-center gap-1.5 border border-neutral-300 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-700 sm:tracking-[0.25em]">
+            ❯<span className="min-w-0 truncate">{displayed}</span>
             {!reducedMotion && (
               <span className="typing-cursor ml-px animate-pulse">_</span>
             )}
@@ -104,8 +132,58 @@ export default function Hero() {
               GitHub
             </a>
           </div>
+
+          <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border border-neutral-300 bg-white/70 px-3 py-2 text-[11px] text-neutral-500 sm:text-xs">
+            <span className="font-bold text-emerald-600">
+              {formatUsd(metrics.saved_usd)} saved
+            </span>
+            <span className="text-neutral-300">|</span>
+            <span>{formatCompact(metrics.tokens_saved)} tokens less</span>
+            <span className="text-neutral-300">|</span>
+            <span>{formatCompact(metrics.calls_avoided)} calls avoided</span>
+          </div>
         </div>
       </div>
     </section>
   );
+}
+
+function normalizeMetrics(payload: unknown): PublicMetrics | null {
+  if (!payload || typeof payload !== "object") return null;
+  const candidate = payload as Record<string, unknown>;
+  const saved_usd = numberValue(candidate.saved_usd);
+  const tokens_saved = intValue(candidate.tokens_saved);
+  const calls_avoided = intValue(candidate.calls_avoided);
+  if (saved_usd <= 0 && tokens_saved <= 0 && calls_avoided <= 0) return null;
+  return { saved_usd, tokens_saved, calls_avoided };
+}
+
+function numberValue(value: unknown): number {
+  const n = typeof value === "number" ? value : Number(value ?? 0);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function intValue(value: unknown): number {
+  const n = numberValue(value);
+  return Math.floor(n);
+}
+
+function formatUsd(value: number): string {
+  return value.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: value < 10 ? 2 : 0,
+    maximumFractionDigits: value < 10 ? 2 : 0,
+  });
+}
+
+function formatCompact(value: number): string {
+  if (value < 1000) return String(Math.floor(value));
+  if (value < 1_000_000) return `${trimDecimal(value / 1000)}k`;
+  if (value < 1_000_000_000) return `${trimDecimal(value / 1_000_000)}m`;
+  return `${trimDecimal(value / 1_000_000_000)}b`;
+}
+
+function trimDecimal(value: number): string {
+  return value.toFixed(1).replace(/\.0$/, "");
 }

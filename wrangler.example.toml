@@ -1,0 +1,12 @@
+name = "atelier-landing"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-16"
+
+[[d1_databases]]
+binding = "TELEMETRY_DB"
+database_name = "atelier-public-telemetry"
+database_id = "replace-with-cloudflare-d1-database-id"
+
+[[kv_namespaces]]
+binding = "METRICS_CACHE"
+id = "replace-with-cloudflare-kv-namespace-id"
