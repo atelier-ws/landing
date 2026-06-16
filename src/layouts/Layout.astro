@@ -4,7 +4,7 @@ interface Props {
   title?: string;
   description?: string;
 }
-  const { title = "Atelier — a leaner runtime for coding agents", description = "Atelier trims what coding agents send to the model: source projection, dedup, code intelligence, and batch edits, across Claude Code, Codex, Cursor, and any MCP host. Measured on every call. Open source, Apache-2.0." } = Astro.props;
+  const { title = "Atelier — a runtime for coding agents", description = "Atelier hosts and orchestrates coding-agent runs: context reads, batch edits, model routing, tool calls, and trace. Open source, Apache-2.0." } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -13,7 +13,7 @@ interface Props {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="theme-color" content="#f7f8fb" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -22,7 +22,7 @@ interface Props {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
   </head>
-  <body class="bg-[#0a0a0a] text-neutral-200 font-mono antialiased">
+  <body class="bg-[#f7f8fb] text-neutral-950 font-mono antialiased">
     <slot />
     <script>
       // Scroll-reveal: observe [data-reveal] elements and add .revealed class

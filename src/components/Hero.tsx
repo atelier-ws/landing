@@ -3,93 +3,45 @@ import GitHubIcon from "./GitHubIcon";
 
 export default function Hero() {
   return (
-    <section className="relative flex min-h-[70vh] w-full flex-col items-center justify-center px-6 pt-16 pb-16 sm:min-h-screen sm:pt-24 sm:pb-24">
-      {/* Background gradient orbs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="glow-purple absolute -top-40 left-1/2 h-[300px] w-[300px] -translate-x-1/2 sm:h-[500px] sm:w-[500px] md:h-[700px] md:w-[700px]" />
-        <div className="glow-cyan absolute -bottom-40 right-0 h-[250px] w-[250px] sm:h-[400px] sm:w-[400px]" />
-      </div>
+    <section className="relative overflow-hidden border-b border-neutral-200 bg-[#f7f8fb] px-6 pt-24 pb-16 text-neutral-950 sm:pt-28 md:pt-32">
+      <div className="pointer-events-none absolute inset-0 bg-grid opacity-80" />
 
-      {/* Grid overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" />
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <div className="max-w-3xl">
+          <div className="mb-6 inline-flex border border-neutral-300 bg-white/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-700">
+            Open-source agent runtime
+          </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center self-center text-center">
-        {/* Eyebrow */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded border border-brand/30 bg-brand/5 px-3 py-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-300">
-            Open source · Apache-2.0
-          </span>
-        </div>
+          <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-5xl md:text-6xl md:leading-[1.06]">
+            Own the runtime for coding agents.
+          </h1>
 
-        {/* Headline */}
-        <h1 className="w-full text-3xl font-bold leading-tight tracking-tight text-neutral-100 sm:text-4xl md:text-6xl md:leading-[1.1]">
-          Cut what your coding
-          <br />
-          <span className="bg-gradient-to-r from-brand-300 via-brand-400 to-purple-400 bg-clip-text text-transparent">
-            agent spends
-          </span>
-        </h1>
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-neutral-600 md:text-base">
+            Atelier hosts and orchestrates the whole run: context reads, batch
+            edits, model routing, tool calls, and a trace of what happened.
+          </p>
 
-        {/* Subtitle */}
-        <p className="mt-6 w-full max-w-2xl text-sm leading-relaxed text-neutral-400 md:text-base md:leading-relaxed">
-          Atelier trims what your coding agent sends to the model, and how
-          often it asks. Source projection, dedup, code intelligence, and batch
-          edits, measured on every call.
-        </p>
-
-        {/* CTA buttons */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
-          <a
-            href="#install"
-            className="inline-flex w-full items-center justify-center gap-2 border border-brand/60 bg-brand/10 px-6 py-3 text-sm font-bold uppercase tracking-widest text-brand-300 no-underline transition hover:bg-brand/20 sm:w-auto"
-          >
-            Install
-            <ArrowRight size={16} />
-          </a>
-          <a
-            href="#benchmark"
-            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-700 px-6 py-3 text-sm font-bold uppercase tracking-widest text-neutral-300 no-underline transition hover:border-neutral-500 hover:text-neutral-100 sm:w-auto"
-          >
-            See the benchmark
-          </a>
-          <a
-            href="https://github.com/atelier-runtime/atelier"
-            className="inline-flex w-full items-center justify-center gap-2 border border-neutral-800 px-6 py-3 text-sm uppercase tracking-widest text-neutral-500 no-underline transition hover:border-neutral-600 hover:text-neutral-300 sm:w-auto"
-          >
-            <GitHubIcon size={16} />
-            GitHub
-          </a>
-        </div>
-
-        {/* Animated terminal preview */}
-        <div className="mt-12 w-full max-w-2xl sm:mt-16">
-          <div className="border border-neutral-800 bg-neutral-950/80">
-            <div className="flex items-center gap-2 border-b border-neutral-800 px-3 py-2 sm:px-4 sm:py-2.5">
-              <span className="h-2 w-2 rounded-full bg-red-500/70 sm:h-2.5 sm:w-2.5" />
-              <span className="h-2 w-2 rounded-full bg-amber-500/70 sm:h-2.5 sm:w-2.5" />
-              <span className="h-2 w-2 rounded-full bg-emerald-500/70 sm:h-2.5 sm:w-2.5" />
-              <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-600">
-                Terminal
-              </span>
-            </div>
-            <pre className="overflow-x-auto border-0 bg-transparent p-3 text-[10px] leading-relaxed text-neutral-300 sm:p-5 sm:text-xs md:text-sm">
-              <span className="text-emerald-400">$</span>{" "}
-              <span className="text-neutral-100">curl -fsSL</span>{" "}
-              https://install.atelier.ws | bash
-              <br />
-              <span className="text-neutral-500"> → installing atelier (CLI + MCP + service)</span>
-              <br />
-              <span className="text-neutral-500"> → wiring into your agent host…</span>
-              <br />
-              <span className="mt-1 inline-block text-emerald-400">✓ Atelier ready — savings now tracked per call</span>
-              <br />
-              <span className="text-emerald-400">$</span>{" "}
-              <span className="text-neutral-100">atelier --version</span>
-              <br />
-              <span className="text-cyan-300">0.3.2</span>
-            </pre>
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <a
+              href="#install"
+              className="inline-flex w-full items-center justify-center gap-2 border border-neutral-950 bg-neutral-950 px-6 py-3 text-sm font-bold uppercase tracking-widest text-white no-underline transition hover:bg-neutral-800 sm:w-auto"
+            >
+              Install
+              <ArrowRight size={16} />
+            </a>
+            <a
+              href="https://docs.atelier.ws/installation"
+              className="inline-flex w-full items-center justify-center gap-2 border border-neutral-300 bg-white/60 px-6 py-3 text-sm font-bold uppercase tracking-widest text-neutral-800 no-underline transition hover:border-neutral-950 hover:text-neutral-950 sm:w-auto"
+            >
+              Read docs
+            </a>
+            <a
+              href="https://github.com/atelier-runtime/atelier"
+              className="inline-flex w-full items-center justify-center gap-2 border border-neutral-300 px-6 py-3 text-sm uppercase tracking-widest text-neutral-600 no-underline transition hover:border-neutral-950 hover:text-neutral-950 sm:w-auto"
+            >
+              <GitHubIcon size={16} />
+              GitHub
+            </a>
           </div>
         </div>
       </div>

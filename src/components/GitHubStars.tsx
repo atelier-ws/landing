@@ -31,7 +31,7 @@ export default function GitHubStars({ className = "" }: { className?: string }) 
   return (
     <a
       href={`https://github.com/${REPO}`}
-      className={`inline-flex items-center gap-1.5 border border-neutral-800 px-2.5 py-1 text-xs font-bold text-neutral-300 no-underline transition hover:border-neutral-600 ${className}`}
+      className={`inline-flex items-center gap-1.5 border border-neutral-300 px-2.5 py-1 text-xs font-bold text-neutral-700 no-underline transition hover:border-neutral-950 hover:text-neutral-950 ${className}`}
       aria-label={`${stars} GitHub stars`}
     >
       <Star size={12} className="text-amber-400" />

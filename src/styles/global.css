@@ -9,11 +9,12 @@ html,
 body {
   height: 100%;
   margin: 0;
+  overflow-x: hidden;
 }
 
 body {
-  background-color: #0a0a0a;
-  color: #e5e5e5;
+  background-color: #f7f8fb;
+  color: #18181b;
   font-family: 'JetBrains Mono', 'Hack Nerd Font Mono', 'Droid Sans Mono', monospace;
   font-feature-settings: 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
@@ -45,7 +46,12 @@ html {
 
 ::selection {
   background-color: rgba(168, 85, 247, 0.25);
-  color: #e5e5e5;
+  color: #18181b;
+}
+
+.terminal-surface ::selection {
+  background-color: rgba(168, 85, 247, 0.35);
+  color: #f5f5f5;
 }
 
 :focus-visible {
@@ -70,25 +76,17 @@ html {
 /* Persistent gradient background */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(155, 117, 217, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(155, 117, 217, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(24, 24, 27, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 24, 27, 0.05) 1px, transparent 1px);
   background-size: 60px 60px;
-}
-
-/* Animated gradient orbs */
-.glow-purple {
-  background: radial-gradient(ellipse at center, rgba(155, 117, 217, 0.15) 0%, transparent 70%);
-}
-.glow-cyan {
-  background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.10) 0%, transparent 70%);
 }
 
 /* Code blocks - terminal style */
 code,
 pre {
-  background-color: #0a0a0a;
-  border: 1px solid #262626;
-  color: #e5e5e5;
+  background-color: transparent;
+  border: 0;
+  color: inherit;
   font-family: 'JetBrains Mono', 'Hack Nerd Font Mono', 'Droid Sans Mono', monospace;
 }
 
@@ -119,6 +117,30 @@ a:hover {
   }
   50% {
     opacity: 0.8;
+  }
+}
+
+@keyframes contextMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.context-marquee {
+  animation: contextMarquee 36s linear infinite;
+}
+
+.context-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .context-marquee {
+    animation: none;
+    flex-wrap: wrap;
   }
 }
 

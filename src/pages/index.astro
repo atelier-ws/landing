@@ -2,41 +2,17 @@
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav";
 import Hero from "../components/Hero";
-import TrustStrip from "../components/TrustStrip";
+import ContextMarquee from "../components/ContextMarquee";
 import TerminalDemo from "../components/TerminalDemo";
-import ProblemSolution from "../components/ProblemSolution";
-import SavingsStack from "../components/SavingsStack";
-import McpBenchmark from "../components/McpBenchmark";
-import BenchmarkSection from "../components/BenchmarkSection";
-import StatsSection from "../components/StatsSection";
 import InstallCmd from "../components/InstallCmd";
-import HowItWorks from "../components/HowItWorks";
-import HostsList from "../components/HostsList";
-import Providers from "../components/Providers";
-import WhyAtelier from "../components/WhyAtelier";
-import Pricing from "../components/Pricing";
-import Faq from "../components/Faq";
-import CtaSection from "../components/CtaSection";
 import Footer from "../components/Footer";
 ---
 
 <Layout>
   <Nav client:load />
   <div data-reveal><Hero client:load /></div>
-  <TrustStrip client:load />
+  <ContextMarquee client:load />
   <div data-reveal><TerminalDemo client:load /></div>
-  <div data-reveal><ProblemSolution client:load /></div>
-  <div data-reveal><SavingsStack client:load /></div>
-  <div data-reveal><McpBenchmark client:load /></div>
-  <div data-reveal><BenchmarkSection client:load /></div>
-  <div data-reveal><StatsSection client:load /></div>
-  <div data-reveal><WhyAtelier client:load /></div>
   <div data-reveal><InstallCmd client:load /></div>
-  <div data-reveal><HowItWorks client:load /></div>
-  <div data-reveal><HostsList client:load /></div>
-  <div data-reveal><Providers client:load /></div>
-  <div data-reveal><Pricing client:load /></div>
-  <div data-reveal><Faq client:load /></div>
-  <div data-reveal><CtaSection client:load /></div>
   <Footer client:load />
 </Layout>

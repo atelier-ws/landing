@@ -5,7 +5,16 @@ import { useEffect, useState } from "react";
 // glyphs, and the ✻ Stop recap. Numbers are an illustrative session, not a
 // benchmark — the real ones render live in your own statusline.
 
-type Stat = { ctx: string; pct: string; cost: string; io: string; saved: string; savedTok: string; carry: string; carryTok: string };
+type Stat = {
+  ctx: string;
+  pct: string;
+  cost: string;
+  io: string;
+  saved: string;
+  savedTok: string;
+  carry: string;
+  carryTok: string;
+};
 
 const PROMPT = "refactor auth to use the new TokenStore";
 
@@ -19,14 +28,86 @@ const TOOLS = [
 ];
 
 const STATS: Stat[] = [
-  { ctx: "6k", pct: "3", cost: "0.03", io: "I: 6k C: 0 O: 1k", saved: "0.00", savedTok: "0", carry: "0.00", carryTok: "0" },
-  { ctx: "12k", pct: "6", cost: "0.12", io: "I: 12k C: 0.2M O: 3k", saved: "0.01", savedTok: "1.1k", carry: "0.02", carryTok: "120k" },
-  { ctx: "19k", pct: "9", cost: "0.28", io: "I: 19k C: 0.5M O: 7k", saved: "0.05", savedTok: "5.3k", carry: "0.06", carryTok: "320k" },
-  { ctx: "24k", pct: "12", cost: "0.44", io: "I: 24k C: 0.7M O: 11k", saved: "0.07", savedTok: "6.8k", carry: "0.12", carryTok: "560k" },
-  { ctx: "26k", pct: "13", cost: "0.61", io: "I: 26k C: 0.9M O: 15k", saved: "0.10", savedTok: "8.0k", carry: "0.20", carryTok: "880k" },
-  { ctx: "31k", pct: "15", cost: "0.83", io: "I: 31k C: 1.1M O: 22k", saved: "0.13", savedTok: "9.2k", carry: "0.28", carryTok: "1.2M" },
-  { ctx: "38k", pct: "18", cost: "1.12", io: "I: 38k C: 1.4M O: 31k", saved: "0.16", savedTok: "9.2k", carry: "0.34", carryTok: "1.4M" },
-  { ctx: "38k", pct: "18", cost: "1.12", io: "I: 38k C: 1.4M O: 31k", saved: "0.16", savedTok: "9.2k", carry: "0.34", carryTok: "1.4M" },
+  {
+    ctx: "6k",
+    pct: "3",
+    cost: "0.03",
+    io: "I: 6k C: 0 O: 1k",
+    saved: "0.00",
+    savedTok: "0",
+    carry: "0.00",
+    carryTok: "0",
+  },
+  {
+    ctx: "12k",
+    pct: "6",
+    cost: "0.12",
+    io: "I: 12k C: 0.2M O: 3k",
+    saved: "0.01",
+    savedTok: "1.1k",
+    carry: "0.02",
+    carryTok: "120k",
+  },
+  {
+    ctx: "19k",
+    pct: "9",
+    cost: "0.28",
+    io: "I: 19k C: 0.5M O: 7k",
+    saved: "0.05",
+    savedTok: "5.3k",
+    carry: "0.06",
+    carryTok: "320k",
+  },
+  {
+    ctx: "24k",
+    pct: "12",
+    cost: "0.44",
+    io: "I: 24k C: 0.7M O: 11k",
+    saved: "0.07",
+    savedTok: "6.8k",
+    carry: "0.12",
+    carryTok: "560k",
+  },
+  {
+    ctx: "26k",
+    pct: "13",
+    cost: "0.61",
+    io: "I: 26k C: 0.9M O: 15k",
+    saved: "0.10",
+    savedTok: "8.0k",
+    carry: "0.20",
+    carryTok: "880k",
+  },
+  {
+    ctx: "31k",
+    pct: "15",
+    cost: "0.83",
+    io: "I: 31k C: 1.1M O: 22k",
+    saved: "0.13",
+    savedTok: "9.2k",
+    carry: "0.28",
+    carryTok: "1.2M",
+  },
+  {
+    ctx: "38k",
+    pct: "18",
+    cost: "1.12",
+    io: "I: 38k C: 1.4M O: 31k",
+    saved: "0.16",
+    savedTok: "9.2k",
+    carry: "0.34",
+    carryTok: "1.4M",
+  },
+  {
+    ctx: "38k",
+    pct: "18",
+    cost: "1.12",
+    io: "I: 38k C: 1.4M O: 31k",
+    saved: "0.16",
+    savedTok: "9.2k",
+    carry: "0.34",
+    carryTok: "1.4M",
+  },
 ];
 
 const STEPS = STATS.length;
@@ -84,30 +165,34 @@ export default function TerminalDemo() {
   }
 
   return (
-    <section className="border-t border-neutral-900 px-6 py-24">
+    <section
+      id="terminal"
+      className="border-t border-neutral-200 bg-[#f7f8fb] px-6 py-24"
+    >
       <div className="mx-auto max-w-3xl">
         <div className="text-center">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">
             In the terminal
           </div>
-          <h2 className="mt-3 text-2xl font-bold text-neutral-100 md:text-3xl">
+          <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
             Watch the savings add up
           </h2>
-          <p className="mt-3 text-sm text-neutral-400">
-            One prompt, the agent works, and the statusline tracks tokens, calls, carry, and cost as it goes.
+          <p className="mt-3 text-sm text-neutral-600">
+            One prompt, the agent works, and the statusline tracks tokens,
+            calls, carry, and cost as it goes.
           </p>
         </div>
 
-        <div className="mt-10 overflow-hidden border border-neutral-800 bg-black">
-          {/* header */}
-          <div className="flex items-center gap-2 border-b border-neutral-800 px-4 py-2.5">
+        <div className="terminal-surface mt-10 overflow-hidden border border-neutral-700/70 bg-[#1f1f23]">
+          <div className="flex items-center gap-2 border-b border-neutral-700/70 bg-[#29292e] px-4 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
-            <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-600">claude code</span>
+            <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-600">
+              claude code
+            </span>
           </div>
 
-          {/* output — fixed height, newest pinned to the bottom like a real terminal tail */}
           <div className="flex h-[260px] flex-col justify-end gap-1 overflow-hidden p-4 font-mono text-[11px] leading-relaxed sm:text-xs">
             {step === 0 && (
               <div className="text-neutral-500">
@@ -128,22 +213,31 @@ export default function TerminalDemo() {
             {showRecap && (
               <div className="mt-2 text-neutral-400">
                 <div>
-                  <span className="text-brand-300">✻</span> Stop says: Atelier: session auto-recorded.
+                  <span className="text-brand-300">✻</span> Stop says: Atelier:
+                  session auto-recorded.
                 </div>
                 <div className="pl-4">8 turns · 14 tool calls</div>
                 <div className="pl-4">
-                  tokens: 76k input (9.8k new + 66k cW) / 1.4M cR / 31k out (1.5M total)
+                  tokens: 76k input (9.8k new + 66k cW) / 1.4M cR / 31k out
+                  (1.5M total)
                 </div>
                 <div className="pl-4">est. cost: ~$1.12</div>
                 <div className="pl-4">
-                  savings: <span className="text-emerald-400">$0.16 · 9,240 tokens saved · 3 calls avoided</span>
+                  savings:{" "}
+                  <span className="text-emerald-400">
+                    $0.16 · 9,240 tokens saved · 3 calls avoided
+                  </span>
                 </div>
                 <div className="pl-4">
-                  context carry: <span className="text-brand-300">$0.34 · 1,420,800 tokens</span>{" "}
+                  context carry:{" "}
+                  <span className="text-brand-300">
+                    $0.34 · 1,420,800 tokens
+                  </span>{" "}
                   (cache re-reads avoided on later turns)
                 </div>
                 <div className="pl-4 text-neutral-600">
-                  top tools: mcp__atelier__read×3 · mcp__atelier__grep×1 · mcp__atelier__edit×1
+                  top tools: mcp__atelier__read×3 · mcp__atelier__grep×1 ·
+                  mcp__atelier__edit×1
                 </div>
                 <div className="mt-1">
                   <span className="text-brand-300">✻</span> Worked for 38s
@@ -152,8 +246,7 @@ export default function TerminalDemo() {
             )}
           </div>
 
-          {/* input box — Claude Code’s prompt box, with the atelier:code tab */}
-          <div className="relative mx-3 mb-2 mt-1 rounded border border-neutral-700 border-l-2 border-l-brand/70 bg-neutral-950/60 px-3 py-2.5 font-mono text-[11px] sm:text-xs">
+          <div className="relative mx-3 mb-2 mt-1 rounded border border-neutral-700 border-l-2 border-l-brand/70 bg-[#29292e] px-3 py-2.5 font-mono text-[11px] sm:text-xs">
             <span className="absolute -top-2.5 right-3 rounded bg-brand/20 px-2 py-0.5 text-[9px] font-bold tracking-wide text-brand-300">
               atelier:code
             </span>
@@ -166,13 +259,14 @@ export default function TerminalDemo() {
             />
           </div>
 
-          {/* statusline — the real shape, with the last call's tokens as (savedTok+N) */}
-          <div className="border-t border-neutral-800 bg-neutral-950 px-4 py-2 font-mono text-[10px] sm:text-[11px]">
+          <div className="border-t border-neutral-700/70 bg-[#29292e] px-4 py-2 font-mono text-[10px] sm:text-[11px]">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="font-bold text-brand-400">atelier</span>
               <span className="text-neutral-600">|</span>
               <span className="text-neutral-300">Sonnet 4.5</span>
-              <span className="text-neutral-500">ctx {s.ctx} {s.pct}%</span>
+              <span className="text-neutral-500">
+                ctx {s.ctx} {s.pct}%
+              </span>
               <span className="text-neutral-600">|</span>
               <span className="text-neutral-200">
                 ${s.cost}
@@ -184,7 +278,9 @@ export default function TerminalDemo() {
                   {"("}
                   {s.savedTok}
                   {lastDelta > 0 ? (
-                    <span className="text-emerald-300">+{lastDelta.toLocaleString()}</span>
+                    <span className="text-emerald-300">
+                      +{lastDelta.toLocaleString()}
+                    </span>
                   ) : null}
                   {")"}
                 </span>
@@ -195,14 +291,11 @@ export default function TerminalDemo() {
               </span>
             </div>
             <div className="mt-1 text-neutral-600">
-              <span className="text-amber-500/70">‣</span> bypass permissions on (shift+tab to cycle)
+              <span className="text-neutral-600">‣</span> bypass permissions on
+              (shift+tab to cycle)
             </div>
           </div>
         </div>
-
-        <p className="mt-4 text-center text-[10px] text-neutral-600">
-          Illustrative session. Your own savings, carry, and cost render live in the statusline.
-        </p>
       </div>
     </section>
   );
