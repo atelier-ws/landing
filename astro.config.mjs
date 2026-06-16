@@ -11,4 +11,13 @@ export default defineConfig({
   ],
   output: "static",
   site: "https://atelier.ws",
+  vite: {
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 500,
+        ignored: ["**/node_modules/**", "**/dist/**", "**/.astro/**", "**/.git/**"],
+      },
+    },
+  },
 });

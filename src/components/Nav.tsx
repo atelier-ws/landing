@@ -15,9 +15,7 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5 no-underline">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-neutral-950 text-lg font-bold text-white">
-            ❯
-          </span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#9b75d9] text-lg font-bold text-white">❯</span>
           <span className="text-base font-bold tracking-wide text-neutral-950">
             ATELIER
           </span>

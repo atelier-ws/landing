@@ -25,9 +25,7 @@ function usePrefersReducedMotion() {
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [displayed, setDisplayed] = useState(
-    reducedMotion ? PHRASES[0] : "",
-  );
+  const [displayed, setDisplayed] = useState(reducedMotion ? PHRASES[0] : "");
   const [phase, setPhase] = useState<Phase>(
     reducedMotion ? "typing" : "typing",
   );
@@ -50,10 +48,7 @@ export default function Hero() {
       }
     } else {
       if (displayed.length > 0) {
-        t = setTimeout(
-          () => setDisplayed(displayed.slice(0, -1)),
-          DELETING_MS,
-        );
+        t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), DELETING_MS);
       } else {
         t = setTimeout(() => {
           setPhraseIndex((i) => (i + 1) % PHRASES.length);
@@ -71,10 +66,10 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          <div className="mb-6 inline-flex border border-neutral-300 bg-white/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-700">
-            <span>{displayed}</span>
+          <div className="mb-6 inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-brand-700">
+            ❯<span>{displayed}</span>
             {!reducedMotion && (
-              <span className="typing-cursor ml-px">|</span>
+              <span className="typing-cursor ml-px animate-pulse">_</span>
             )}
           </div>
 
