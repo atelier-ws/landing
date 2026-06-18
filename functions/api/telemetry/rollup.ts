@@ -35,6 +35,7 @@ type RollupPayload = {
   saved_usd?: unknown;
   tokens_saved?: unknown;
   calls_avoided?: unknown;
+  turn_count?: unknown;
   occurred_at?: unknown;
 };
 
@@ -42,6 +43,7 @@ type PublicMetrics = {
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
+  turns: number;
   sessions: number;
   installs: number;
   updated_at: string | null;
@@ -67,7 +69,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     return json({ error: "telemetry_db_not_configured" }, 503, corsHeaders());
   }
 
-  const contentLength = Number(context.request.headers.get("content-length") ?? 0);
+  const contentLength = Number(
+    context.request.headers.get("content-length") ?? 0,
+  );
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
     return json({ error: "payload_too_large" }, 413, corsHeaders());
   }
@@ -79,19 +83,34 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     return json({ error: "invalid_json" }, 400, corsHeaders());
   }
 
-  const installId = stringValue(payload.anon_id) || stringValue(payload.install_id);
+  const installId =
+    stringValue(payload.anon_id) || stringValue(payload.install_id);
   const sessionId = stringValue(payload.session_id);
   if (!installId || !sessionId) {
-    return json({ error: "install_id_and_session_id_required" }, 400, corsHeaders());
+    return json(
+      { error: "install_id_and_session_id_required" },
+      400,
+      corsHeaders(),
+    );
   }
 
   const savedUsd = boundedNumber(payload.saved_usd, MAX_SESSION_USD);
   const tokensSaved = boundedInt(payload.tokens_saved, MAX_SESSION_TOKENS);
   const callsAvoided = boundedInt(payload.calls_avoided, MAX_SESSION_CALLS);
+  const MAX_SESSION_TURNS = 10_000;
+  const turnCount = boundedInt(payload.turn_count, MAX_SESSION_TURNS);
   if (savedUsd === null || tokensSaved === null || callsAvoided === null) {
     return json({ error: "invalid_metric_value" }, 400, corsHeaders());
   }
-  if (savedUsd <= 0 && tokensSaved <= 0 && callsAvoided <= 0) {
+  if (turnCount === null) {
+    return json({ error: "invalid_metric_value" }, 400, corsHeaders());
+  }
+  if (
+    savedUsd <= 0 &&
+    tokensSaved <= 0 &&
+    callsAvoided <= 0 &&
+    turnCount <= 0
+  ) {
     return json({ ok: true, stored: false }, 202, corsHeaders());
   }
 
@@ -102,7 +121,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const version = labelValue(payload.atelier_version, "unknown", 64);
   const source = labelValue(payload.source, "atelier", 40);
 
-  await context.env.TELEMETRY_DB.prepare(`
+  await context.env.TELEMETRY_DB.prepare(
+    `
     INSERT INTO telemetry_rollups (
       session_key,
       install_key,
@@ -112,9 +132,10 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       source,
       saved_usd,
       tokens_saved,
-      calls_avoided
+      calls_avoided,
+      turns
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(session_key) DO UPDATE SET
       install_key = excluded.install_key,
       occurred_at = excluded.occurred_at,
@@ -123,8 +144,10 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       source = excluded.source,
       saved_usd = max(telemetry_rollups.saved_usd, excluded.saved_usd),
       tokens_saved = max(telemetry_rollups.tokens_saved, excluded.tokens_saved),
-      calls_avoided = max(telemetry_rollups.calls_avoided, excluded.calls_avoided)
-  `)
+      calls_avoided = max(telemetry_rollups.calls_avoided, excluded.calls_avoided),
+      turns = max(telemetry_rollups.turns, excluded.turns)
+  `,
+  )
     .bind(
       sessionKey,
       installKey,
@@ -135,6 +158,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       roundMoney(savedUsd),
       tokensSaved,
       callsAvoided,
+      turnCount,
     )
     .run();
 
@@ -148,22 +172,26 @@ export async function onRequest(context: PagesContext): Promise<Response> {
 
 async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
   const row = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT
         COALESCE(SUM(saved_usd), 0) AS saved_usd,
         COALESCE(SUM(tokens_saved), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
+        COALESCE(SUM(turns), 0) AS turns,
         COUNT(*) AS sessions,
         COUNT(DISTINCT install_key) AS installs,
         MAX(received_at) AS updated_at
       FROM telemetry_rollups
-    `)
+    `,
+    )
     .first<Record<string, unknown>>();
 
   return {
     saved_usd: roundMoney(numberValue(row?.saved_usd)),
     tokens_saved: intValue(row?.tokens_saved),
     calls_avoided: intValue(row?.calls_avoided),
+    turns: intValue(row?.turns),
     sessions: intValue(row?.sessions),
     installs: intValue(row?.installs),
     updated_at:
@@ -185,7 +213,11 @@ function stringValue(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function labelValue(value: unknown, fallback: string, maxLength: number): string {
+function labelValue(
+  value: unknown,
+  fallback: string,
+  maxLength: number,
+): string {
   const raw = stringValue(value) || fallback;
   const cleaned = raw.replace(/[^A-Za-z0-9_.:+\/-]/g, "").slice(0, maxLength);
   return cleaned || fallback;

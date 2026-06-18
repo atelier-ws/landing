@@ -29,6 +29,7 @@ type PublicMetrics = {
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
+  turns: number;
   sessions: number;
   installs: number;
   updated_at: string | null;
@@ -64,22 +65,26 @@ export async function onRequest(context: PagesContext): Promise<Response> {
 
 async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
   const row = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT
         COALESCE(SUM(saved_usd), 0) AS saved_usd,
         COALESCE(SUM(tokens_saved), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
+        COALESCE(SUM(turns), 0) AS turns,
         COUNT(*) AS sessions,
         COUNT(DISTINCT install_key) AS installs,
         MAX(received_at) AS updated_at
       FROM telemetry_rollups
-    `)
+    `,
+    )
     .first<Record<string, unknown>>();
 
   return {
     saved_usd: roundMoney(numberValue(row?.saved_usd)),
     tokens_saved: intValue(row?.tokens_saved),
     calls_avoided: intValue(row?.calls_avoided),
+    turns: intValue(row?.turns),
     sessions: intValue(row?.sessions),
     installs: intValue(row?.installs),
     updated_at:
@@ -96,6 +101,7 @@ function normalizeMetrics(value: unknown): PublicMetrics | null {
     saved_usd: roundMoney(numberValue(candidate.saved_usd)),
     tokens_saved: intValue(candidate.tokens_saved),
     calls_avoided: intValue(candidate.calls_avoided),
+    turns: intValue(candidate.turns),
     sessions: intValue(candidate.sessions),
     installs: intValue(candidate.installs),
     updated_at:
@@ -122,7 +128,8 @@ function roundMoney(value: number): number {
 
 function cacheHeaders(): Record<string, string> {
   return {
-    "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=60, s-maxage=300, stale-while-revalidate=3600",
     "Access-Control-Allow-Origin": "*",
   };
 }
