@@ -15,6 +15,7 @@ type PublicMetrics = {
   tokens_saved: number;
   calls_avoided: number;
   turns: number;
+  sessions: number;
 };
 
 const FALLBACK_METRICS: PublicMetrics = {
@@ -22,6 +23,7 @@ const FALLBACK_METRICS: PublicMetrics = {
   tokens_saved: 9200,
   calls_avoided: 8,
   turns: 0,
+  sessions: 0,
 };
 
 function usePrefersReducedMotion() {
@@ -145,6 +147,12 @@ export default function Hero() {
             <span>{formatCompact(metrics.calls_avoided)} calls avoided</span>
             <span className="text-neutral-300">|</span>
             <span>{formatCompact(metrics.turns)} turns</span>
+            {metrics.sessions > 0 && (
+              <>
+                <span className="text-neutral-300">|</span>
+                <span>{formatCompact(metrics.sessions)} sessions</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -164,6 +172,7 @@ function normalizeMetrics(payload: unknown): PublicMetrics | null {
     tokens_saved,
     calls_avoided,
     turns: intValue(candidate.turns),
+    sessions: intValue(candidate.sessions),
   };
 }
 

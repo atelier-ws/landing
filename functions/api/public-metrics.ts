@@ -68,8 +68,8 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .prepare(
       `
       SELECT
-        COALESCE(SUM(saved_usd), 0) AS saved_usd,
-        COALESCE(SUM(tokens_saved), 0) AS tokens_saved,
+        COALESCE(SUM(saved_usd + carry_usd), 0) AS saved_usd,
+        COALESCE(SUM(tokens_saved + carry_tokens), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
         COALESCE(SUM(turns), 0) AS turns,
         COUNT(*) AS sessions,

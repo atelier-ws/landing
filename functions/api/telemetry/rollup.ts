@@ -35,6 +35,8 @@ type RollupPayload = {
   saved_usd?: unknown;
   tokens_saved?: unknown;
   calls_avoided?: unknown;
+  carry_usd?: unknown;
+  carry_tokens?: unknown;
   turn_count?: unknown;
   occurred_at?: unknown;
 };
@@ -97,6 +99,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const savedUsd = boundedNumber(payload.saved_usd, MAX_SESSION_USD);
   const tokensSaved = boundedInt(payload.tokens_saved, MAX_SESSION_TOKENS);
   const callsAvoided = boundedInt(payload.calls_avoided, MAX_SESSION_CALLS);
+  const carryUsd = boundedNumber(payload.carry_usd, MAX_SESSION_USD) ?? 0;
+  const carryTokens = boundedInt(payload.carry_tokens, 1_000_000_000) ?? 0;
   const MAX_SESSION_TURNS = 10_000;
   const turnCount = boundedInt(payload.turn_count, MAX_SESSION_TURNS);
   if (savedUsd === null || tokensSaved === null || callsAvoided === null) {
@@ -109,6 +113,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     savedUsd <= 0 &&
     tokensSaved <= 0 &&
     callsAvoided <= 0 &&
+    carryUsd <= 0 &&
+    carryTokens <= 0 &&
     turnCount <= 0
   ) {
     return json({ ok: true, stored: false }, 202, corsHeaders());
@@ -128,14 +134,17 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       install_key,
       occurred_at,
       received_at,
+      -- carry columns added in migration 0003
       atelier_version,
       source,
       saved_usd,
       tokens_saved,
       calls_avoided,
+      carry_usd,
+      carry_tokens,
       turns
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(session_key) DO UPDATE SET
       install_key = excluded.install_key,
       occurred_at = excluded.occurred_at,
@@ -145,6 +154,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       saved_usd = max(telemetry_rollups.saved_usd, excluded.saved_usd),
       tokens_saved = max(telemetry_rollups.tokens_saved, excluded.tokens_saved),
       calls_avoided = max(telemetry_rollups.calls_avoided, excluded.calls_avoided),
+      carry_usd = max(telemetry_rollups.carry_usd, excluded.carry_usd),
+      carry_tokens = max(telemetry_rollups.carry_tokens, excluded.carry_tokens),
       turns = max(telemetry_rollups.turns, excluded.turns)
   `,
   )
@@ -158,6 +169,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       roundMoney(savedUsd),
       tokensSaved,
       callsAvoided,
+      roundMoney(carryUsd),
+      carryTokens,
       turnCount,
     )
     .run();
@@ -175,8 +188,8 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .prepare(
       `
       SELECT
-        COALESCE(SUM(saved_usd), 0) AS saved_usd,
-        COALESCE(SUM(tokens_saved), 0) AS tokens_saved,
+        COALESCE(SUM(saved_usd + carry_usd), 0) AS saved_usd,
+        COALESCE(SUM(tokens_saved + carry_tokens), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
         COALESCE(SUM(turns), 0) AS turns,
         COUNT(*) AS sessions,
