@@ -35,15 +35,15 @@ npx wrangler kv namespace create METRICS_CACHE
 npx wrangler d1 execute atelier-public-telemetry --file migrations/0001_public_telemetry_rollups.sql
 ```
 
-Bind them to the Pages project:
+Bind them to the Worker:
 
 - D1 binding name: `TELEMETRY_DB`
 - KV binding name: `METRICS_CACHE`
 
-You can bind them in the Cloudflare dashboard under the Pages project settings,
-or copy `wrangler.example.toml` to `wrangler.toml` and replace the placeholder
-IDs. Do not commit real IDs until the production Pages project is meant to use
-that Wrangler file.
+Copy `wrangler.example.toml` to `wrangler.toml` and replace the placeholder IDs.
+`wrangler.toml` is gitignored because it holds real Cloudflare resource IDs, so
+keep the committed `wrangler.example.toml` template in sync (bindings **and**
+`routes`) -- a drift there is how the apex custom domain got missed.
 
 Rollup payload shape:
 
@@ -66,7 +66,21 @@ accepted rollup.
 
 ## Deploy
 
-The main site is hosted at **https://atelier.ws**. Push to `main` to deploy via the configured CI/CD pipeline. Documentation lives at **https://docs.atelier.ws** (deployed separately).
+The main site is hosted at **https://atelier.ws** as a Cloudflare Worker (static
+`dist/` assets + `src/worker.ts` for the `/api/*` routes). There is **no CI/CD
+pipeline** -- deploys are manual:
+
+```bash
+npm run build        # regenerate dist/
+npx wrangler deploy  # upload worker + assets, bind custom domains
+```
+
+`wrangler deploy` binds the custom domains declared under `routes` in
+`wrangler.toml` -- both **atelier.ws** and **www.atelier.ws**. If only `www` is
+bound, the apex serves a stale target and `atelier.ws/api/*` 404s. Verify both
+after deploying: `curl https://atelier.ws/api/badge?metric=savings`.
+
+Documentation lives at **https://docs.atelier.ws** (deployed separately).
 
 ## Contact
 

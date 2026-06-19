@@ -2,6 +2,15 @@ name = "atelier-landing"
 main = "src/worker.ts"
 compatibility_date = "2026-06-16"
 
+# Custom domains this Worker serves. BOTH the apex and www must be listed -- www
+# was attached via the dashboard while the apex was not, so atelier.ws/api/* (the
+# README live badges) 404'd against a stale target. Declaring them here binds
+# them reproducibly on `wrangler deploy`.
+routes = [
+  { pattern = "atelier.ws", custom_domain = true },
+  { pattern = "www.atelier.ws", custom_domain = true },
+]
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
