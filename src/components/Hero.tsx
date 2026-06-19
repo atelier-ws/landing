@@ -18,14 +18,6 @@ type PublicMetrics = {
   sessions: number;
 };
 
-const FALLBACK_METRICS: PublicMetrics = {
-  saved_usd: 0.16,
-  tokens_saved: 9200,
-  calls_avoided: 8,
-  turns: 0,
-  sessions: 0,
-};
-
 function usePrefersReducedMotion() {
   const [prefersReduced, setPrefersReduced] = useState(false);
   useEffect(() => {
@@ -40,7 +32,7 @@ function usePrefersReducedMotion() {
 
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
-  const [metrics, setMetrics] = useState<PublicMetrics>(FALLBACK_METRICS);
+  const [metrics, setMetrics] = useState<PublicMetrics | null>(null);
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [displayed, setDisplayed] = useState(reducedMotion ? PHRASES[0] : "");
   const [phase, setPhase] = useState<Phase>(
@@ -55,10 +47,10 @@ export default function Hero() {
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
         const nextMetrics = normalizeMetrics(payload);
-        if (nextMetrics) setMetrics(nextMetrics);
+        setMetrics(nextMetrics);
       })
       .catch(() => {
-        // Keep the static fallback when the Cloudflare binding is not configured.
+        setMetrics(null);
       });
     return () => controller.abort();
   }, []);
@@ -137,23 +129,25 @@ export default function Hero() {
             </a>
           </div>
 
-          <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border border-neutral-300 bg-white/70 px-3 py-2 text-[11px] text-neutral-500 sm:text-xs">
-            <span className="font-bold text-emerald-600">
-              {formatUsd(metrics.saved_usd)} saved
-            </span>
-            <span className="text-neutral-300">|</span>
-            <span>{formatCompact(metrics.tokens_saved)} tokens less</span>
-            <span className="text-neutral-300">|</span>
-            <span>{formatCompact(metrics.calls_avoided)} calls avoided</span>
-            <span className="text-neutral-300">|</span>
-            <span>{formatCompact(metrics.turns)} turns</span>
-            {metrics.sessions > 0 && (
-              <>
-                <span className="text-neutral-300">|</span>
-                <span>{formatCompact(metrics.sessions)} sessions</span>
-              </>
-            )}
-          </div>
+          {metrics && (
+            <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border border-neutral-300 bg-white/70 px-3 py-2 text-[11px] text-neutral-500 sm:text-xs">
+              <span className="font-bold text-emerald-600">
+                {formatUsd(metrics.saved_usd)} saved
+              </span>
+              <span className="text-neutral-300">|</span>
+              <span>{formatCompact(metrics.tokens_saved)} tokens less</span>
+              <span className="text-neutral-300">|</span>
+              <span>{formatCompact(metrics.calls_avoided)} calls avoided</span>
+              <span className="text-neutral-300">|</span>
+              <span>{formatCompact(metrics.turns)} turns</span>
+              {metrics.sessions > 0 && (
+                <>
+                  <span className="text-neutral-300">|</span>
+                  <span>{formatCompact(metrics.sessions)} sessions</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
