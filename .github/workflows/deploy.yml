@@ -1,11 +1,5 @@
-# Deploys the landing Cloudflare Worker on every push to main, so the committed
-# wrangler.toml (Worker = src/worker.ts, ./dist assets, apex + www custom-domain
-# routes, and run_worker_first = ["/api/*"]) is what actually goes live. This is
-# what makes /api/public-metrics stick instead of 404'ing after a push.
-#
-# Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   CLOUDFLARE_API_TOKEN   - token with "Edit Cloudflare Workers" permissions
-#   CLOUDFLARE_ACCOUNT_ID  - the account that owns the Worker + atelier.ws
+```yaml
+# Deploys the landing Cloudflare Worker on every push to main.
 name: Deploy landing
 
 on:
@@ -13,30 +7,37 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Never run two deploys at once; cancel a superseded run.
 concurrency:
   group: deploy-landing
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
       # Astro static output -> ./dist, uploaded as the Worker's assets.
-      - run: npm run build
+      - name: Build site
+        run: npm run build
 
       - name: Deploy Worker to Cloudflare
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: deploy
+```
