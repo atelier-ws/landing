@@ -22,3 +22,8 @@ wrangler.toml
 
 # Wrangler local cache / build artifacts
 .wrangler/
+
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
