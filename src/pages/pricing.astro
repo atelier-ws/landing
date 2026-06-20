@@ -1,0 +1,18 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav";
+import Pricing from "../components/Pricing";
+import Footer from "../components/Footer";
+---
+
+<Layout
+  title="Pricing - Atelier"
+  description="Atelier pricing: Free, Pro, and Enterprise. Open-core and local-first - Pro unlocks search & indexing at scale, cross-session memory, the savings engine, and model routing."
+  canonicalPath="/pricing"
+>
+  <Nav client:load />
+  <main id="main-content">
+    <Pricing client:load />
+  </main>
+  <Footer client:load />
+</Layout>

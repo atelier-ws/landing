@@ -17,7 +17,6 @@ const TIERS: Tier[] = [
     blurb: "A grounded coding-agent runtime that runs fully local.",
     features: [
       "Code-nav MCP tools — read, grep, search, edit",
-      "Agent reasoning runtime — rescue, loop detection, verify",
       "Repo map + context engine for normal-size repos",
       "Single-repo memory, host packaging, benchmarks",
       "See how much you'd save",
