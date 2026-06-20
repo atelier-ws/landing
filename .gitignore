@@ -22,3 +22,5 @@ wrangler.toml
 
 # Wrangler local cache / build artifacts
 .wrangler/
+.playwright-mcp/
+/*.png
