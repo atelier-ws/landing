@@ -175,6 +175,7 @@ const structuredData = {
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content="Atelier - open-source context runtime for coding agents" />
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <slot name="head" />
   </head>
   <body class="bg-[#f7f8fb] text-neutral-950 font-mono antialiased">
     <slot />

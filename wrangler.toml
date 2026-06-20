@@ -23,6 +23,9 @@ html_handling = "drop-trailing-slash"
 # asset responses.
 run_worker_first = true
 
+[vars]
+PRO_CHECKOUT_URL="https://buy.stripe.com/test_eVq7sD9zwaGS5i58M8e7m01"
+
 [[d1_databases]]
 binding = "TELEMETRY_DB"
 database_name = "atelier-telemetry"
