@@ -22,7 +22,7 @@ export default function InstallCmd() {
       className="border-t border-neutral-200 bg-[#f7f8fb] px-6 py-24"
     >
       <div className="mx-auto max-w-3xl text-center">
-        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">
+        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-600">
           Get started
         </div>
         <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">

@@ -62,7 +62,7 @@ export default function Pricing() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
-          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-600">
             Pricing
           </div>
           <h1 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
@@ -82,12 +82,12 @@ export default function Pricing() {
               key={tier.name}
               className={`flex flex-col border bg-white p-6 ${
                 tier.featured
-                  ? "border-[#9b75d9] shadow-lg ring-1 ring-[#9b75d9]"
+                  ? "border-brand shadow-lg ring-1 ring-brand"
                   : "border-neutral-200"
               }`}
             >
               {tier.featured && (
-                <div className="mb-3 inline-flex self-start bg-[#9b75d9] px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+                <div className="mb-3 inline-flex self-start bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
                   Most popular
                 </div>
               )}
@@ -116,7 +116,7 @@ export default function Pricing() {
                   >
                     <Check
                       size={15}
-                      className="mt-0.5 shrink-0 text-[#9b75d9]"
+                      className="mt-0.5 shrink-0 text-brand"
                     />
                     <span>{f}</span>
                   </li>
@@ -127,7 +127,7 @@ export default function Pricing() {
                 href={tier.cta.href}
                 className={`mt-6 inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-widest no-underline transition ${
                   tier.featured
-                    ? "bg-[#9b75d9] text-white hover:bg-[#8a64c8]"
+                    ? "bg-brand-600 text-white hover:bg-brand-700"
                     : "border border-neutral-950 text-neutral-950 hover:bg-neutral-950 hover:text-white"
                 }`}
               >
@@ -137,7 +137,7 @@ export default function Pricing() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-xs text-neutral-500">
+        <p className="mt-8 text-center text-xs text-neutral-600">
           Activation is offline — no license server, no phone-home. Cancel any
           subscription anytime.
         </p>
