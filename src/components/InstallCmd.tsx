@@ -28,9 +28,6 @@ export default function InstallCmd() {
         <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
           Install in one command
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
-          Runs locally — CLI, MCP server, and store. No cloud dependency.
-        </p>
 
         {/* Command */}
         <div className="mt-8 flex items-center justify-between border border-neutral-300 bg-white px-4 py-3.5">

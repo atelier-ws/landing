@@ -177,10 +177,6 @@ export default function TerminalDemo() {
           <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
             Watch the savings add up
           </h2>
-          <p className="mt-3 text-sm text-neutral-600">
-            One prompt, the agent works, and the statusline tracks tokens,
-            calls, carry, and cost as it goes.
-          </p>
         </div>
 
         <div className="terminal-surface mt-10 overflow-hidden border border-neutral-700/70 bg-[#1f1f23]">
@@ -296,15 +292,12 @@ export default function TerminalDemo() {
             </div>
           </div>
         </div>
-        <p className="mt-4 text-center text-[11px] leading-relaxed text-neutral-500">
-          Statusline:{" "}
-          <span className="text-neutral-700">
-            atelier | model · ctx used % | $cost (I input / C cache / O output)
-            ↓ saved ♻ context carry
-          </span>
-          . Numbers are an illustrative session, not a benchmark.
-        </p>
       </div>
+      <p className="sr-only">
+        Statusline: atelier | model · ctx used % | $cost (I input / C cache / O
+        output) ↓ saved ♻ context carry. Numbers are an illustrative session,
+        not a benchmark.
+      </p>
     </section>
   );
 }

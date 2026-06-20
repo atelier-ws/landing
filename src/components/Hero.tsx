@@ -103,10 +103,8 @@ export default function Hero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-sm leading-relaxed text-neutral-600 md:text-base">
-            Atelier is the open-source MCP runtime for Claude Code, Codex, and
-            Cursor. It hosts and orchestrates the whole run: context reads,
-            batch edits, model routing, tool calls, and a trace of what
-            happened.
+            Models are getting smarter, but a model is only as capable as the
+            environment supporting it. Atelier is that environment.
           </p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -130,15 +128,6 @@ export default function Hero() {
               <GitHubIcon size={16} />
               GitHub
             </a>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] uppercase tracking-widest text-neutral-500">
-            <GitHubStars />
-            <span>Apache-2.0</span>
-            <span className="text-neutral-300">·</span>
-            <span>Local-first</span>
-            <span className="text-neutral-300">·</span>
-            <span>No phone-home</span>
           </div>
 
           {metrics && (
