@@ -296,6 +296,14 @@ export default function TerminalDemo() {
             </div>
           </div>
         </div>
+        <p className="mt-4 text-center text-[11px] leading-relaxed text-neutral-500">
+          Statusline:{" "}
+          <span className="text-neutral-700">
+            atelier | model · ctx used % | $cost (I input / C cache / O output)
+            ↓ saved ♻ context carry
+          </span>
+          . Numbers are an illustrative session, not a benchmark.
+        </p>
       </div>
     </section>
   );

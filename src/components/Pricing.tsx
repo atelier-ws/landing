@@ -65,13 +65,14 @@ export default function Pricing() {
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">
             Pricing
           </div>
-          <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
+          <h1 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
             Open-core. Free is genuinely useful.
-          </h2>
+          </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">
-            The whole runtime is Apache-2.0 and runs on your machine. Pro unlocks
-            search &amp; indexing at scale, cross-session memory, the savings
-            engine, and model routing.
+            The whole runtime is Apache-2.0 and runs on your machine alongside
+            Claude Code, Codex, Cursor, and any MCP host. Pro unlocks search
+            &amp; indexing at scale, cross-session memory, the savings engine,
+            and model routing.
           </p>
         </div>
 
@@ -98,7 +99,9 @@ export default function Pricing() {
                   {tier.price}
                 </span>
                 {tier.cadence && (
-                  <span className="text-xs text-neutral-500">{tier.cadence}</span>
+                  <span className="text-xs text-neutral-500">
+                    {tier.cadence}
+                  </span>
                 )}
               </div>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">

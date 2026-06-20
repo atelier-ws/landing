@@ -19,8 +19,18 @@ export default {
         },
       },
       fontFamily: {
-        mono: ['"Hack Nerd Font Mono"', '"Hack Nerd Font"', '"Droid Sans Mono"', "monospace"],
-        sans: ['"Hack Nerd Font Mono"', '"Hack Nerd Font"', '"Droid Sans Mono"', "monospace"],
+        mono: [
+          '"JetBrains Mono"',
+          '"Hack Nerd Font Mono"',
+          '"Droid Sans Mono"',
+          "monospace",
+        ],
+        sans: [
+          '"JetBrains Mono"',
+          '"Hack Nerd Font Mono"',
+          '"Droid Sans Mono"',
+          "monospace",
+        ],
       },
     },
   },

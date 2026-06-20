@@ -6,15 +6,102 @@ import ContextMarquee from "../components/ContextMarquee";
 import TerminalDemo from "../components/TerminalDemo";
 import InstallCmd from "../components/InstallCmd";
 import Footer from "../components/Footer";
+
+const pillars = [
+  {
+    title: "Code intelligence",
+    body: "SCIP- and tree-sitter-backed reads, ranked search (Zoekt, BM25), outline and range reads, and source projection — so agents find code instead of grepping blindly.",
+  },
+  {
+    title: "Context reuse",
+    body: "Deduped re-reads, context compaction, prefix-cache diagnostics, and cross-session recall keep the working set small and cache-friendly across turns.",
+  },
+  {
+    title: "Model routing & cost",
+    body: "Route work across vendors and models, set token budgets, and track spend with a savings engine that shows what each run cost and saved.",
+  },
+  {
+    title: "Auditable traces",
+    body: "Every session is recorded to a run ledger — turns, tool calls, tokens, and cost — so you can review, debug, and govern what your agents did.",
+  },
+];
 ---
 
 <Layout>
   <Nav client:load />
   <main id="main-content">
-    <div data-reveal><Hero client:load /></div>
-    <ContextMarquee client:load />
-    <div data-reveal><TerminalDemo client:load /></div>
-    <div data-reveal><InstallCmd client:load /></div>
+    <Hero client:idle />
+    <ContextMarquee />
+    <section
+      id="what-is-atelier"
+      class="border-b border-neutral-200 bg-[#f7f8fb] px-6 py-20"
+    >
+      <div class="mx-auto max-w-3xl">
+        <div
+          class="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500"
+        >
+          What is Atelier?
+        </div>
+        <h2
+          class="mt-3 text-2xl font-bold leading-tight text-neutral-950 md:text-3xl"
+        >
+          The open-source runtime for Claude Code and coding agents.
+        </h2>
+        <div
+          class="mt-5 space-y-4 text-sm leading-relaxed text-neutral-700 md:text-base"
+        >
+          <p>
+            Atelier is an open-source runtime that sits between your coding agent
+            and your codebase. It ships as a CLI, an <strong>MCP server</strong>,
+            and SDK middleware, so agents like <strong>Claude Code</strong>,
+            Codex, Copilot, Cursor, and any MCP-compatible host can read, search,
+            and edit real repositories without rediscovering structure on every
+            turn. Everything runs locally — CLI, MCP server, and store — with no
+            cloud dependency and no phone-home.
+          </p>
+          <p>
+            Instead of re-reading files and burning tokens, agents get supervised
+            code-navigation tools, SCIP-indexed code intelligence, reusable
+            procedures, and a run ledger of what happened. The result is fewer
+            wasted tokens, fewer redundant tool calls, and an auditable trace of
+            every run — which is why developers reach for Atelier to keep agent
+            cost and context under control on large codebases.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-6 sm:grid-cols-2">
+          {
+            pillars.map((pillar) => (
+              <div>
+                <h3 class="text-sm font-bold uppercase tracking-widest text-neutral-950">
+                  {pillar.title}
+                </h3>
+                <p class="mt-2 text-sm leading-relaxed text-neutral-600">
+                  {pillar.body}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="mt-10 flex flex-wrap gap-4 text-xs uppercase tracking-widest">
+          <a
+            href="https://docs.atelier.ws/installation"
+            class="text-brand-700 no-underline transition hover:text-neutral-950"
+          >
+            Read the docs →
+          </a>
+          <a
+            href="/pricing"
+            class="text-brand-700 no-underline transition hover:text-neutral-950"
+          >
+            See pricing →
+          </a>
+        </div>
+      </div>
+    </section>
+    <div data-reveal><TerminalDemo client:visible /></div>
+    <div data-reveal><InstallCmd client:visible /></div>
   </main>
-  <Footer client:load />
+  <Footer />
 </Layout>

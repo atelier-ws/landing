@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
+import GitHubStars from "./GitHubStars";
 import { useState, useEffect } from "react";
 
 const PHRASES = ["Open-source agent runtime", "Apache 2.0"];
@@ -102,8 +103,10 @@ export default function Hero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-sm leading-relaxed text-neutral-600 md:text-base">
-            Atelier hosts and orchestrates the whole run: context reads, batch
-            edits, model routing, tool calls, and a trace of what happened.
+            Atelier is the open-source MCP runtime for Claude Code, Codex, and
+            Cursor. It hosts and orchestrates the whole run: context reads,
+            batch edits, model routing, tool calls, and a trace of what
+            happened.
           </p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -127,6 +130,15 @@ export default function Hero() {
               <GitHubIcon size={16} />
               GitHub
             </a>
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] uppercase tracking-widest text-neutral-500">
+            <GitHubStars />
+            <span>Apache-2.0</span>
+            <span className="text-neutral-300">·</span>
+            <span>Local-first</span>
+            <span className="text-neutral-300">·</span>
+            <span>No phone-home</span>
           </div>
 
           {metrics && (

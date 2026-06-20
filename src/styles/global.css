@@ -59,9 +59,10 @@ html {
   outline-offset: 2px;
 }
 
-/* No shadows - borders only */
-* {
-  box-shadow: none !important;
+/* No shadows by default - borders only. No !important, and elements that opt in
+   via ring/shadow utilities (e.g. the featured pricing card) keep their box-shadow. */
+*:not([class*="ring"]):not([class*="shadow"]) {
+  box-shadow: none;
 }
 
 /* Terminal-style borders */

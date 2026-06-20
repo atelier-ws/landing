@@ -16,7 +16,9 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5 no-underline">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#9b75d9] text-lg font-bold text-white">❯</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#9b75d9] text-lg font-bold text-white">
+            ❯
+          </span>
           <span className="text-base font-bold tracking-wide text-neutral-950">
             ATELIER
           </span>
@@ -54,7 +56,7 @@ export default function Nav() {
         {/* Mobile toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-neutral-700 md:hidden"
+          className="-mr-2 p-2 text-neutral-700 md:hidden"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -75,13 +77,14 @@ export default function Nav() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-xs uppercase tracking-widest text-neutral-700 no-underline transition hover:text-neutral-950"
+                className="py-2 text-xs uppercase tracking-widest text-neutral-700 no-underline transition hover:text-neutral-950"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </a>
             ))}
             <div className="mt-2 flex items-center gap-3 border-t border-neutral-200 pt-3">
+              <GitHubStars />
               <a
                 href="https://github.com/atelier-ws/atelier"
                 className="text-neutral-600 transition hover:text-neutral-950"

@@ -14,10 +14,14 @@ routes = [
 [assets]
 directory = "./dist"
 binding = "ASSETS"
-# Static assets are matched before the Worker by default, which swallowed
-# /api/* and returned the static 404 page instead of invoking the handlers.
-# Force API paths to the Worker first; everything else still serves from ./dist.
-run_worker_first = ["/api/*"]
+# Serve clean, slash-free URLs (e.g. /pricing) so the served URL matches the
+# canonical tag and the sitemap; /pricing/ 301-redirects to /pricing.
+html_handling = "drop-trailing-slash"
+# The Worker runs first for every request so it can 301 www -> apex (see
+# src/worker.ts) and so /api/* reaches the handlers. It still falls through to
+# ./dist for static assets, and the `_headers` file is applied to those
+# asset responses.
+run_worker_first = true
 
 [[d1_databases]]
 binding = "TELEMETRY_DB"

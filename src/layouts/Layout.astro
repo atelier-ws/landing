@@ -1,77 +1,142 @@
 ---
 import "../styles/global.css";
 
+interface Breadcrumb {
+  name: string;
+  path: string;
+}
+
 interface Props {
   title?: string;
   description?: string;
   canonicalPath?: string;
   image?: string;
+  breadcrumbs?: Breadcrumb[];
 }
 
 const SITE_URL = "https://atelier.ws";
 const SITE_NAME = "Atelier";
-const DEFAULT_TITLE = "Atelier - Open-Source Context Runtime for Coding Agents";
+const DEFAULT_TITLE =
+  "Atelier - Open-Source MCP Runtime for Claude Code & Coding Agents";
 const DEFAULT_DESCRIPTION =
-  "Atelier is an open-source runtime for coding agents: MCP server and SDK middleware for code intelligence, routing, cost tracking, and auditable traces.";
+  "Atelier is the open-source MCP runtime for Claude Code and coding agents: code intelligence, context reuse, model routing, cost tracking, and auditable traces.";
+// Canonical product description for the SoftwareApplication node. Kept separate
+// from the per-page meta `description` so the schema never inherits page copy.
+const SOFTWARE_DESCRIPTION =
+  "Atelier is an open-source runtime for coding agents: an MCP server and SDK middleware for code intelligence, context reuse, model routing, cost tracking, and auditable run traces. Runs locally alongside Claude Code, Codex, Cursor, and any MCP host.";
 
 const {
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
   canonicalPath = "/",
   image = "/og.png",
+  breadcrumbs,
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, SITE_URL).toString();
 const imageUrl = new URL(image, SITE_URL).toString();
+const buildDate = new Date().toISOString().slice(0, 10);
+
+const graph: Record<string, unknown>[] = [
+  {
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/logo.png`,
+      width: 512,
+      height: 512,
+    },
+    email: "contact@atelier.ws",
+    sameAs: ["https://github.com/atelier-ws/atelier"],
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
+    inLanguage: "en",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+  },
+  {
+    "@type": "SoftwareApplication",
+    "@id": `${SITE_URL}/#software`,
+    name: SITE_NAME,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: ["Linux", "macOS"],
+    url: `${SITE_URL}/`,
+    downloadUrl: "https://install.atelier.ws",
+    codeRepository: "https://github.com/atelier-ws/atelier",
+    license: "https://www.apache.org/licenses/LICENSE-2.0",
+    isAccessibleForFree: true,
+    dateModified: buildDate,
+    description: SOFTWARE_DESCRIPTION,
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Free",
+        price: "0",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/pricing`,
+      },
+      {
+        "@type": "Offer",
+        name: "Pro",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/pricing`,
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: "19.00",
+          priceCurrency: "USD",
+          unitCode: "MON",
+          billingDuration: 1,
+          billingIncrement: 1,
+        },
+      },
+      {
+        "@type": "Offer",
+        name: "Enterprise",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/pricing`,
+        priceSpecification: {
+          "@type": "PriceSpecification",
+          priceCurrency: "USD",
+          description: "Custom pricing - contact sales",
+        },
+      },
+    ],
+    featureList: [
+      "MCP server for coding-agent hosts",
+      "SDK middleware for AI agent runtimes",
+      "SCIP-indexed code intelligence",
+      "Context reuse and compaction",
+      "Model routing and cost tracking",
+      "Auditable run traces",
+    ],
+    publisher: { "@id": `${SITE_URL}/#organization` },
+  },
+];
+
+if (breadcrumbs && breadcrumbs.length > 0) {
+  graph.push({
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: new URL(crumb.path, SITE_URL).toString(),
+    })),
+  });
+}
 
 const structuredData = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: SITE_NAME,
-      url: `${SITE_URL}/`,
-      logo: `${SITE_URL}/favicon.svg`,
-      email: "contact@atelier.ws",
-      sameAs: ["https://github.com/atelier-ws/atelier"],
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}/#website`,
-      name: SITE_NAME,
-      url: `${SITE_URL}/`,
-      inLanguage: "en",
-      publisher: { "@id": `${SITE_URL}/#organization` },
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#software`,
-      name: SITE_NAME,
-      applicationCategory: "DeveloperApplication",
-      operatingSystem: ["Linux", "macOS"],
-      url: `${SITE_URL}/`,
-      downloadUrl: "https://install.atelier.ws",
-      codeRepository: "https://github.com/atelier-ws/atelier",
-      license: "https://www.apache.org/licenses/LICENSE-2.0",
-      isAccessibleForFree: true,
-      description,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
-      featureList: [
-        "MCP server for coding-agent hosts",
-        "SDK middleware for AI agent runtimes",
-        "SCIP-indexed code intelligence",
-        "Context reuse and compaction",
-        "Model routing and cost tracking",
-        "Auditable run traces",
-      ],
-      publisher: { "@id": `${SITE_URL}/#organization` },
-    },
-  ],
+  "@graph": graph,
 };
 ---
 <!doctype html>
@@ -127,9 +192,9 @@ const structuredData = {
           },
           { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
         );
-        document.addEventListener("DOMContentLoaded", () => {
-          document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
-        });
+        // Script is at the end of <body>, so [data-reveal] elements already
+        // exist — observe immediately rather than waiting for DOMContentLoaded.
+        document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
       }
     </script>
   </body>

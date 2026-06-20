@@ -34,7 +34,7 @@ export default function InstallCmd() {
 
         {/* Command */}
         <div className="mt-8 flex items-center justify-between border border-neutral-300 bg-white px-4 py-3.5">
-          <code className="overflow-x-auto whitespace-nowrap text-xs text-neutral-950 md:text-sm">
+          <code className="min-w-0 overflow-x-auto whitespace-nowrap text-xs text-neutral-950 md:text-sm">
             <span className="text-neutral-400">$</span> {INSTALL_CMD}
           </code>
           <button

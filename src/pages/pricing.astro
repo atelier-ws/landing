@@ -3,16 +3,73 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav";
 import Pricing from "../components/Pricing";
 import Footer from "../components/Footer";
+
+// FAQ content only — intentionally NO FAQPage schema. Google retired FAQ rich
+// results for all sites (May 2026); the content still helps users and AI answers.
+const faqs = [
+  {
+    q: "Is the Free plan actually useful?",
+    a: "Yes. Free is the full local runtime under Apache-2.0: code-navigation MCP tools, the context engine for normal-size repos, single-repo memory, host packaging, and benchmarks. It is not a crippled trial.",
+  },
+  {
+    q: "Does Pro require cloud connectivity?",
+    a: "No. Atelier is local-first and activation is offline — no license server and no phone-home. Pro unlocks large-repo indexing, cross-session recall, the savings engine, and model routing, all running on your machine.",
+  },
+  {
+    q: "What does the savings engine actually do?",
+    a: "It tracks tokens, tool calls, context carry, and cost per run, then lets you apply policies to cut waste — and shows a full breakdown of what each session cost and saved.",
+  },
+  {
+    q: "Which agents and hosts work with Atelier?",
+    a: "Claude Code, Codex, Copilot, Cursor, opencode, Hermes Agent, LangChain, the OpenAI SDK, Gemini ADK, and any MCP-compatible host.",
+  },
+  {
+    q: "How is Enterprise licensed?",
+    a: "Enterprise adds uncapped indexing, shared team context, governance with audit export and retention, SSO, and priority support. You can self-host the license issuer. Contact us to scope it.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes — cancel any subscription anytime. Because activation is offline, the runtime keeps working locally for the period you have paid for.",
+  },
+];
 ---
 
 <Layout
-  title="Pricing - Atelier"
-  description="Atelier pricing: Free, Pro, and Enterprise. Open-core and local-first - Pro unlocks search & indexing at scale, cross-session memory, the savings engine, and model routing."
+  title="Atelier Pricing: Free, Pro & Enterprise for Claude Code"
+  description="Atelier pricing: Free, Pro ($19/mo), and Enterprise - open-core and local-first. Pro adds large-repo indexing, cross-session memory, and model routing."
   canonicalPath="/pricing"
+  breadcrumbs={[
+    { name: "Home", path: "/" },
+    { name: "Pricing", path: "/pricing" },
+  ]}
 >
   <Nav client:load />
   <main id="main-content">
-    <Pricing client:load />
+    <Pricing />
+    <section id="faq" class="border-t border-neutral-200 bg-white px-6 py-20">
+      <div class="mx-auto max-w-3xl">
+        <div
+          class="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500"
+        >
+          FAQ
+        </div>
+        <h2 class="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
+          Pricing questions
+        </h2>
+        <dl class="mt-8 divide-y divide-neutral-200 border-y border-neutral-200">
+          {
+            faqs.map((f) => (
+              <div class="py-5">
+                <dt class="text-sm font-bold text-neutral-950">{f.q}</dt>
+                <dd class="mt-2 text-sm leading-relaxed text-neutral-600">
+                  {f.a}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
   </main>
-  <Footer client:load />
+  <Footer />
 </Layout>

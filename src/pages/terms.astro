@@ -1,0 +1,92 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+
+const updated = "June 20, 2026";
+---
+
+<Layout
+  title="Terms of Service - Atelier"
+  description="Terms for using the atelier.ws website and Atelier subscriptions. The Atelier runtime is open-source under Apache-2.0; Pro is billed via Stripe, cancel anytime."
+  canonicalPath="/terms"
+  breadcrumbs={[
+    { name: "Home", path: "/" },
+    { name: "Terms", path: "/terms" },
+  ]}
+>
+  <Nav client:load />
+  <main id="main-content">
+    <section class="px-6 pb-24 pt-28">
+      <div class="mx-auto max-w-3xl">
+        <h1 class="text-3xl font-bold text-neutral-950">Terms of Service</h1>
+        <p class="mt-2 text-xs uppercase tracking-widest text-neutral-500">
+          Last updated {updated}
+        </p>
+        <div
+          class="mt-8 space-y-6 text-sm leading-relaxed text-neutral-700 md:text-base"
+        >
+          <p>
+            These terms govern your use of the <strong>atelier.ws</strong>
+            website and any Atelier subscription you purchase.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">The software</h2>
+          <p>
+            The Atelier runtime is open-source software licensed under
+            <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>.
+            Your use of the software is governed by that license, including its
+            warranty disclaimer and limitation of liability.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">Subscriptions</h2>
+          <ul class="list-disc space-y-2 pl-5">
+            <li>
+              Pro is billed monthly or annually through Stripe at the prices
+              shown on the <a href="/pricing">pricing page</a>.
+            </li>
+            <li>
+              You can cancel any subscription at any time. Activation is offline,
+              so the runtime keeps working locally for the period you have paid
+              for.
+            </li>
+            <li>
+              Enterprise terms are set out in a separate agreement scoped with
+              our team.
+            </li>
+          </ul>
+
+          <h2 class="text-lg font-bold text-neutral-950">Acceptable use</h2>
+          <p>
+            Do not misuse the website or attempt to disrupt, reverse-engineer, or
+            gain unauthorized access to our services. We may suspend access for
+            abuse.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">
+            Disclaimer &amp; liability
+          </h2>
+          <p>
+            The website and services are provided “as is” without warranties of
+            any kind. To the maximum extent permitted by law, Atelier is not
+            liable for indirect or consequential damages arising from your use of
+            the website or software.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">Changes</h2>
+          <p>
+            We may update these terms; material changes will be reflected by the
+            “last updated” date above.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">Contact</h2>
+          <p>
+            Questions about these terms:
+            <a href="mailto:contact@atelier.ws">contact@atelier.ws</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

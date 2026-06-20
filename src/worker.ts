@@ -22,6 +22,12 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Consolidate www -> apex (301) so link equity and indexing target one host.
+    if (url.hostname === "www.atelier.ws") {
+      url.hostname = "atelier.ws";
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (url.pathname === "/api/public-metrics") {
       return handlePublicMetrics({ request, env });
     }
@@ -45,7 +51,9 @@ export default {
     if (url.pathname === "/enterprise" || url.pathname === "/enterprise/") {
       return new Response(null, {
         status: 302,
-        headers: { Location: "mailto:contact@atelier.ws?subject=Atelier%20Enterprise" },
+        headers: {
+          Location: "mailto:contact@atelier.ws?subject=Atelier%20Enterprise",
+        },
       });
     }
 

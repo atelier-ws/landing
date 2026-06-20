@@ -1,0 +1,84 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+
+const updated = "June 20, 2026";
+---
+
+<Layout
+  title="Privacy Policy - Atelier"
+  description="How the atelier.ws website handles data: anonymous usage metrics, Stripe payments, and the GitHub star count. Local-first runtime, no ad tracking."
+  canonicalPath="/privacy"
+  breadcrumbs={[
+    { name: "Home", path: "/" },
+    { name: "Privacy", path: "/privacy" },
+  ]}
+>
+  <Nav client:load />
+  <main id="main-content">
+    <section class="px-6 pb-24 pt-28">
+      <div class="mx-auto max-w-3xl">
+        <h1 class="text-3xl font-bold text-neutral-950">Privacy Policy</h1>
+        <p class="mt-2 text-xs uppercase tracking-widest text-neutral-500">
+          Last updated {updated}
+        </p>
+        <div
+          class="mt-8 space-y-6 text-sm leading-relaxed text-neutral-700 md:text-base"
+        >
+          <p>
+            This policy covers the <strong>atelier.ws</strong> website. The
+            Atelier runtime itself is open-source software that runs locally on
+            your machine; it is local-first and does not phone home.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">What we collect</h2>
+          <ul class="list-disc space-y-2 pl-5">
+            <li>
+              <strong>Anonymous usage metrics.</strong> Aggregate,
+              non-identifying totals (for example tokens saved or calls avoided)
+              used to show public counters. No personal data, source code, or
+              prompts are collected.
+            </li>
+            <li>
+              <strong>Payments.</strong> Pro subscriptions are processed by
+              Stripe. Your payment details are handled by Stripe under its own
+              privacy policy; we never see or store card numbers.
+            </li>
+            <li>
+              <strong>GitHub star count.</strong> The site fetches a public star
+              count from GitHub's API in your browser, which is a request from
+              your browser to GitHub under GitHub's policies.
+            </li>
+            <li>
+              <strong>Server logs.</strong> Our host (Cloudflare) processes
+              standard request metadata such as IP address and user agent to
+              serve and protect the site.
+            </li>
+          </ul>
+
+          <h2 class="text-lg font-bold text-neutral-950">What we do not do</h2>
+          <p>
+            We do not use advertising cookies, sell personal data, or track you
+            across other sites.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">Your choices</h2>
+          <p>
+            For access, correction, or deletion requests relating to a
+            subscription, email
+            <a href="mailto:contact@atelier.ws">contact@atelier.ws</a>. Payment
+            data requests can also be directed to Stripe.
+          </p>
+
+          <h2 class="text-lg font-bold text-neutral-950">Contact</h2>
+          <p>
+            Questions about this policy:
+            <a href="mailto:contact@atelier.ws">contact@atelier.ws</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
