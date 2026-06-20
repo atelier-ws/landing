@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
 import GitHubStars from "./GitHubStars";
@@ -10,6 +10,11 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (mobileMenuRef.current) mobileMenuRef.current.inert = !mobileOpen;
+  }, [mobileOpen]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-[#f7f8fb]/90 backdrop-blur-md transition-all duration-300">
@@ -66,7 +71,7 @@ export default function Nav() {
       {/* Mobile menu */}
       <div
         id="mobile-menu"
-        inert={mobileOpen ? undefined : true}
+        ref={mobileMenuRef}
         aria-hidden={!mobileOpen}
         className={`overflow-hidden transition-all duration-300 md:hidden ${
           mobileOpen
