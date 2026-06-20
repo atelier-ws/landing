@@ -16,7 +16,7 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5 no-underline">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#9b75d9] text-lg font-bold text-white">❯</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand text-lg font-bold text-white">❯</span>
           <span className="text-base font-bold tracking-wide text-neutral-950">
             ATELIER
           </span>
@@ -56,6 +56,8 @@ export default function Nav() {
           onClick={() => setMobileOpen(!mobileOpen)}
           className="text-neutral-700 md:hidden"
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -63,6 +65,9 @@ export default function Nav() {
 
       {/* Mobile menu */}
       <div
+        id="mobile-menu"
+        inert={mobileOpen ? undefined : true}
+        aria-hidden={!mobileOpen}
         className={`overflow-hidden transition-all duration-300 md:hidden ${
           mobileOpen
             ? "max-h-64 border-t border-neutral-200 bg-[#f7f8fb]/95"
