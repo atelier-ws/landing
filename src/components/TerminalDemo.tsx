@@ -171,7 +171,7 @@ export default function TerminalDemo() {
     >
       <div className="mx-auto max-w-3xl">
         <div className="text-center">
-          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-600">
             In the terminal
           </div>
           <h2 className="mt-3 text-2xl font-bold text-neutral-950 md:text-3xl">
@@ -188,14 +188,14 @@ export default function TerminalDemo() {
             <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
-            <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-600">
+            <span className="ml-3 text-[10px] uppercase tracking-widest text-neutral-400">
               claude code
             </span>
           </div>
 
           <div className="flex h-[260px] flex-col justify-end gap-1 overflow-hidden p-4 font-mono text-[11px] leading-relaxed sm:text-xs">
             {step === 0 && (
-              <div className="text-neutral-500">
+              <div className="text-neutral-400">
                 <span className="animate-pulse">✶</span> Working…
               </div>
             )}
@@ -206,7 +206,7 @@ export default function TerminalDemo() {
                   <span className="text-neutral-200">⏺</span>{" "}
                   <span className="text-neutral-100">{t.call}</span>
                 </div>
-                <div className="pl-1 text-neutral-500">⎿ {t.result}</div>
+                <div className="pl-1 text-neutral-400">⎿ {t.result}</div>
               </div>
             ))}
 
@@ -235,7 +235,7 @@ export default function TerminalDemo() {
                   </span>{" "}
                   (cache re-reads avoided on later turns)
                 </div>
-                <div className="pl-4 text-neutral-600">
+                <div className="pl-4 text-neutral-400">
                   top tools: mcp__atelier__read×3 · mcp__atelier__grep×1 ·
                   mcp__atelier__edit×1
                 </div>
@@ -261,16 +261,16 @@ export default function TerminalDemo() {
 
           <div className="border-t border-neutral-700/70 bg-[#29292e] px-4 py-2 font-mono text-[10px] sm:text-[11px]">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="font-bold text-brand-400">atelier</span>
-              <span className="text-neutral-600">|</span>
+              <span className="font-bold text-brand-300">atelier</span>
+              <span className="text-neutral-400">|</span>
               <span className="text-neutral-300">Sonnet 4.5</span>
-              <span className="text-neutral-500">
+              <span className="text-neutral-400">
                 ctx {s.ctx} {s.pct}%
               </span>
-              <span className="text-neutral-600">|</span>
+              <span className="text-neutral-400">|</span>
               <span className="text-neutral-200">
                 ${s.cost}
-                <span className="text-neutral-500">({s.io})</span>
+                <span className="text-neutral-400">({s.io})</span>
               </span>
               <span className="text-emerald-400">
                 ↓ ${s.saved}
@@ -290,8 +290,8 @@ export default function TerminalDemo() {
                 <span className="text-brand-300/70">({s.carryTok})</span>
               </span>
             </div>
-            <div className="mt-1 text-neutral-600">
-              <span className="text-neutral-600">‣</span> bypass permissions on
+            <div className="mt-1 text-neutral-400">
+              <span className="text-neutral-400">‣</span> bypass permissions on
               (shift+tab to cycle)
             </div>
           </div>
