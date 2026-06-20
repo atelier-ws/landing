@@ -38,7 +38,7 @@ export default function ContextMarquee() {
       className="border-b border-neutral-200 bg-[#f7f8fb] py-4"
     >
       <div className="mx-auto flex max-w-6xl items-center gap-4 overflow-hidden px-6">
-        <div className="hidden shrink-0 text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500 sm:block">
+        <div className="hidden shrink-0 text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-600 sm:block">
           Context engine
         </div>
         <div className="relative min-w-0 flex-1 overflow-hidden">
