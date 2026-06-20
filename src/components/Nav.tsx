@@ -4,6 +4,7 @@ import GitHubIcon from "./GitHubIcon";
 import GitHubStars from "./GitHubStars";
 
 const NAV_LINKS = [
+  { label: "Pricing", href: "#pricing" },
   { label: "Docs", href: "https://docs.atelier.ws/installation" },
 ];
 
