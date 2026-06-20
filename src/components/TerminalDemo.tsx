@@ -274,7 +274,7 @@ export default function TerminalDemo() {
               </span>
               <span className="text-emerald-400">
                 ↓ ${s.saved}
-                <span className="text-emerald-400/70">
+                <span className="text-emerald-400">
                   {"("}
                   {s.savedTok}
                   {lastDelta > 0 ? (
