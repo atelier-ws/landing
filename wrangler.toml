@@ -1,0 +1,34 @@
+name = "landing"
+main = "src/worker.ts"
+compatibility_date = "2026-06-16"
+
+# Custom domains served by this Worker. `www` was attached via the dashboard but
+# the apex was not, so atelier.ws/api/* fell through to a stale target and 404'd
+# (the README live badges hit the apex). Declaring both here makes the routing
+# reproducible and committable.
+routes = [
+  { pattern = "atelier.ws", custom_domain = true },
+  { pattern = "www.atelier.ws", custom_domain = true },
+]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Serve clean, slash-free URLs (e.g. /pricing) so the served URL matches the
+# canonical tag and the sitemap; /pricing/ 301-redirects to /pricing.
+html_handling = "drop-trailing-slash"
+# The Worker runs first for every request so it can 301 www -> apex (see
+# src/worker.ts) and so /api/* reaches the handlers. It still falls through to
+# ./dist for static assets, and the `_headers` file is applied to those
+# asset responses.
+run_worker_first = true
+
+[[d1_databases]]
+binding = "TELEMETRY_DB"
+database_name = "atelier-telemetry"
+database_id = "7556e5f5-0d3f-4e88-82cc-959bee7d47f5"
+
+[[kv_namespaces]]
+binding = "METRICS_CACHE"
+id = "33ef24a94db948259fe9c34362db6818"
+

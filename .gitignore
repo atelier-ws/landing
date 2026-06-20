@@ -17,9 +17,6 @@ Thumbs.db
 *.swp
 *.swo
 
-# Wrangler local config (contains real Cloudflare resource IDs)
-wrangler.toml
-
 # Wrangler local cache / build artifacts
 .wrangler/
 .playwright-mcp/
