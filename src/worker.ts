@@ -8,18 +8,18 @@ import { onRequest as handlePublicMetrics } from "../functions/api/public-metric
 import { onRequest as handleRollup } from "../functions/api/telemetry/rollup";
 import { onRequest as handleBadge } from "../functions/api/badge";
 import { onRequest as handleStatsSvg } from "../functions/api/stats.svg";
-
-export interface Env {
-  TELEMETRY_DB?: D1Database;
-  METRICS_CACHE?: KVNamespace;
-  ASSETS: Fetcher;
-  // Stripe Payment Link for Pro. Set via wrangler [vars] or a secret; until it
-  // is configured, /pro lands on the pricing page.
-  PRO_CHECKOUT_URL?: string;
-}
+import {
+  handleCheckoutClaim,
+  handleLicenseRecovery,
+  type LicenseEnv,
+} from "../functions/api/license";
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: LicenseEnv,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
     const url = new URL(request.url);
 
     // Consolidate www -> apex (301) so link equity and indexing target one host.
@@ -41,11 +41,19 @@ export default {
     if (url.pathname === "/api/stats.svg") {
       return handleStatsSvg({ request, env });
     }
+    if (url.pathname === "/api/license/checkout") {
+      return handleCheckoutClaim(request, env, ctx);
+    }
+    if (url.pathname === "/api/license/recover") {
+      return handleLicenseRecovery(request, env, ctx);
+    }
 
-    // Pro purchase -> Stripe Payment Link (PRO_CHECKOUT_URL); falls back to the
-    // pricing page until that's configured. Enterprise -> contact email.
+    // Pro purchase -> the selected Stripe Payment Link. Enterprise -> contact.
     if (url.pathname === "/pro" || url.pathname === "/pro/") {
-      const dest = env.PRO_CHECKOUT_URL || new URL("/pricing/", url).toString();
+      const dest =
+        url.searchParams.get("billing") === "monthly"
+          ? env.PRO_MONTHLY_CHECKOUT_URL
+          : env.PRO_YEARLY_CHECKOUT_URL;
       return new Response(null, { status: 302, headers: { Location: dest } });
     }
     if (url.pathname === "/enterprise" || url.pathname === "/enterprise/") {
@@ -59,4 +67,4 @@ export default {
 
     return env.ASSETS.fetch(request);
   },
-};
+} satisfies ExportedHandler<LicenseEnv>;

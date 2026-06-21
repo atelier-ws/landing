@@ -9,11 +9,11 @@ import Footer from "../components/Footer";
 const faqs = [
   {
     q: "Is the Free plan actually useful?",
-    a: "Yes. Free is the full local runtime under Apache-2.0: code-navigation MCP tools, the context engine for normal-size repos, single-repo memory, host packaging, and benchmarks. It is not a crippled trial.",
+    a: "Yes. Free is the full local runtime, source-available under the FSL: code-navigation MCP tools, the context engine for normal-size repos, single-repo memory, host packaging, and benchmarks. It is not a crippled trial.",
   },
   {
     q: "Does Pro require cloud connectivity?",
-    a: "No. Atelier is local-first and activation is offline — no license server and no phone-home. Pro unlocks large-repo indexing, cross-session recall, the savings engine, and model routing, all running on your machine.",
+    a: "Only for activation and periodic license refresh. Atelier enrolls the device once, checks the signed lease locally, and refreshes it automatically every 30 days. A 7-day grace period covers temporary offline use.",
   },
   {
     q: "What does the savings engine actually do?",
@@ -29,7 +29,15 @@ const faqs = [
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes — cancel any subscription anytime. Because activation is offline, the runtime keeps working locally for the period you have paid for.",
+    a: "Yes — cancel any subscription anytime. Existing device leases continue through their current paid and grace period, then Pro features fall back to Free.",
+  },
+  {
+    q: "How many devices can I use?",
+    a: "Pro supports three active devices. If you activate a fourth, the CLI lists your active devices and asks you to remove one first. The replacement activates immediately with no cooldown.",
+  },
+  {
+    q: "Where do I get my license key after payment?",
+    a: "After Stripe confirms payment, the website displays your Pro license and emails a copy to the checkout address. If you lose it, use the license recovery page to have the current key sent again.",
   },
 ];
 ---

@@ -17,6 +17,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Local secrets and generated signing material
+.dev.vars*
+license-private.pem
+
 # Wrangler local cache / build artifacts
 .wrangler/
 .playwright-mcp/

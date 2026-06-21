@@ -1,0 +1,22 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/Nav";
+import Footer from "../../components/Footer";
+import LicenseSuccess from "../../components/LicenseSuccess";
+---
+
+<Layout
+  title="Your Atelier Pro license"
+  description="Retrieve your Atelier Pro license after checkout."
+  canonicalPath="/license/success"
+  robots="noindex,nofollow,noarchive"
+>
+  <meta slot="head" name="referrer" content="no-referrer" />
+  <Nav client:load />
+  <main id="main-content" class="px-6 pb-24 pt-32">
+    <div class="mx-auto max-w-2xl">
+      <LicenseSuccess client:load />
+    </div>
+  </main>
+  <Footer />
+</Layout>

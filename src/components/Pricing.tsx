@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 
 const PRO_LINKS = {
-  monthly: "https://buy.stripe.com/test_fZu00bfXU4iufWJ5zWe7m00",
-  yearly: "https://buy.stripe.com/test_eVq7sD9zwaGS5i58M8e7m01",
+  monthly: "/pro?billing=monthly",
+  yearly: "/pro?billing=yearly",
 };
 
 type SideTier = {
@@ -71,7 +71,10 @@ function SideTierCard({ tier }: { tier: SideTier }) {
 
       <ul className="mt-5 flex flex-1 flex-col gap-2.5">
         {tier.features.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-sm text-neutral-700">
+          <li
+            key={f}
+            className="flex items-start gap-2 text-sm text-neutral-700"
+          >
             <Check size={15} className="mt-0.5 shrink-0 text-brand" />
             <span>{f}</span>
           </li>
@@ -128,7 +131,9 @@ function ProCard() {
           Yearly
           <span
             className={`rounded px-1 py-px text-[9px] font-bold uppercase ${
-              isYearly ? "bg-brand-600 text-white" : "bg-brand-100 text-brand-700"
+              isYearly
+                ? "bg-brand-600 text-white"
+                : "bg-brand-100 text-brand-700"
             }`}
           >
             Save 17%
@@ -139,9 +144,7 @@ function ProCard() {
       {/* Price */}
       <div className="mt-3 flex items-baseline gap-1.5">
         {isYearly && (
-          <span className="text-lg text-neutral-400 line-through">
-            $19
-          </span>
+          <span className="text-lg text-neutral-400 line-through">$19</span>
         )}
         <span className="text-3xl font-bold text-neutral-950">
           {isYearly ? "$15.83" : "$19"}
@@ -157,7 +160,10 @@ function ProCard() {
 
       <ul className="mt-5 flex flex-1 flex-col gap-2.5">
         {PRO_FEATURES.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-sm text-neutral-700">
+          <li
+            key={f}
+            className="flex items-start gap-2 text-sm text-neutral-700"
+          >
             <Check size={15} className="mt-0.5 shrink-0 text-brand" />
             <span>{f}</span>
           </li>
@@ -190,10 +196,10 @@ export default function Pricing() {
             Open-core. Free is genuinely useful.
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">
-            The whole runtime is Apache-2.0 and runs on your machine alongside
-            Claude Code, Codex, Cursor, and any MCP host. Pro unlocks search
-            &amp; indexing at scale, cross-session memory, the savings engine,
-            and model routing.
+            The core runtime is source-available under the FSL and runs on your
+            machine alongside Claude Code, Codex, Cursor, and any MCP host. Pro
+            unlocks search &amp; indexing at scale, cross-session memory, the
+            savings engine, and model routing.
           </p>
         </div>
 
@@ -204,8 +210,13 @@ export default function Pricing() {
         </div>
 
         <p className="mt-8 text-center text-xs text-neutral-600">
-          Activation is offline — no license server, no phone-home. Cancel any
-          subscription anytime.
+          Use Pro on up to 3 devices. Leases refresh every 30 days with a 7-day
+          offline grace period. Cancel any subscription anytime. Already
+          purchased?{" "}
+          <a href="/license/recover" className="text-brand-700 underline">
+            Recover your license
+          </a>
+          .
         </p>
       </div>
     </section>

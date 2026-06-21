@@ -1,0 +1,20 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/Nav";
+import Footer from "../../components/Footer";
+import LicenseRecovery from "../../components/LicenseRecovery";
+---
+
+<Layout
+  title="Recover your Atelier Pro license"
+  description="Resend an Atelier Pro license key to the email used for purchase."
+  canonicalPath="/license/recover"
+>
+  <Nav client:load />
+  <main id="main-content" class="px-6 pb-24 pt-32">
+    <div class="mx-auto max-w-xl">
+      <LicenseRecovery client:load />
+    </div>
+  </main>
+  <Footer />
+</Layout>

@@ -12,18 +12,19 @@ interface Props {
   canonicalPath?: string;
   image?: string;
   breadcrumbs?: Breadcrumb[];
+  robots?: string;
 }
 
 const SITE_URL = "https://atelier.ws";
 const SITE_NAME = "Atelier";
 const DEFAULT_TITLE =
-  "Atelier - Open-Source MCP Runtime for Claude Code & Coding Agents";
+  "Atelier - Source-Available MCP Runtime for Claude Code & Coding Agents";
 const DEFAULT_DESCRIPTION =
-  "Atelier is the open-source MCP runtime for Claude Code and coding agents: code intelligence, context reuse, model routing, cost tracking, and auditable traces.";
+  "Atelier is the source-available MCP runtime for Claude Code and coding agents: code intelligence, context reuse, model routing, cost tracking, and auditable traces.";
 // Canonical product description for the SoftwareApplication node. Kept separate
 // from the per-page meta `description` so the schema never inherits page copy.
 const SOFTWARE_DESCRIPTION =
-  "Atelier is an open-source runtime for coding agents: an MCP server and SDK middleware for code intelligence, context reuse, model routing, cost tracking, and auditable run traces. Runs locally alongside Claude Code, Codex, Cursor, and any MCP host.";
+  "Atelier is a source-available runtime for coding agents: an MCP server and SDK middleware for code intelligence, context reuse, model routing, cost tracking, and auditable run traces. Runs locally alongside Claude Code, Codex, Cursor, and any MCP host.";
 
 const {
   title = DEFAULT_TITLE,
@@ -31,6 +32,7 @@ const {
   canonicalPath = "/",
   image = "/og.png",
   breadcrumbs,
+  robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, SITE_URL).toString();
@@ -69,7 +71,7 @@ const graph: Record<string, unknown>[] = [
     url: `${SITE_URL}/`,
     downloadUrl: "https://install.atelier.ws",
     codeRepository: "https://github.com/atelier-ws/atelier",
-    license: "https://www.apache.org/licenses/LICENSE-2.0",
+    license: "https://fsl.software/",
     isAccessibleForFree: true,
     dateModified: buildDate,
     description: SOFTWARE_DESCRIPTION,
@@ -146,7 +148,7 @@ const structuredData = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="robots" content={robots} />
     <meta name="author" content="Atelier" />
     <meta name="application-name" content="Atelier" />
     <meta name="theme-color" content="#f7f8fb" />
@@ -168,12 +170,12 @@ const structuredData = {
     <meta property="og:image" content={imageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Atelier - open-source context runtime for coding agents" />
+    <meta property="og:image:alt" content="Atelier - source-available context runtime for coding agents" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
-    <meta name="twitter:image:alt" content="Atelier - open-source context runtime for coding agents" />
+    <meta name="twitter:image:alt" content="Atelier - source-available context runtime for coding agents" />
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <slot name="head" />
   </head>

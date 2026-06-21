@@ -1,6 +1,7 @@
 name = "atelier-landing"
 main = "src/worker.ts"
-compatibility_date = "2026-06-16"
+compatibility_date = "2026-06-21"
+compatibility_flags = ["nodejs_compat"]
 
 # Custom domains this Worker serves. BOTH the apex and www must be listed -- www
 # was attached via the dashboard while the apex was not, so atelier.ws/api/* (the
@@ -9,6 +10,10 @@ compatibility_date = "2026-06-16"
 routes = [
   { pattern = "atelier.ws", custom_domain = true },
   { pattern = "www.atelier.ws", custom_domain = true },
+]
+
+send_email = [
+  { name = "EMAIL", allowed_sender_addresses = ["licenses@atelier.ws"] },
 ]
 
 [assets]
@@ -23,10 +28,25 @@ html_handling = "drop-trailing-slash"
 # asset responses.
 run_worker_first = true
 
+[vars]
+PRO_MONTHLY_CHECKOUT_URL = "replace-with-monthly-stripe-payment-link"
+PRO_YEARLY_CHECKOUT_URL = "replace-with-yearly-stripe-payment-link"
+LICENSE_FROM_EMAIL = "licenses@atelier.ws"
+SITE_URL = "https://atelier.ws"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [[d1_databases]]
 binding = "TELEMETRY_DB"
 database_name = "atelier-public-telemetry"
 database_id = "replace-with-cloudflare-d1-database-id"
+
+[[d1_databases]]
+binding = "LICENSE_DB"
+database_name = "atelier-licenses"
+database_id = "replace-with-license-issuer-d1-database-id"
 
 [[kv_namespaces]]
 binding = "METRICS_CACHE"
