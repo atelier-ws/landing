@@ -51,7 +51,6 @@ export default function Footer() {
           >
             Terms
           </a>
-          <span>FSL-1.1-ALv2</span>
         </div>
       </div>
     </footer>

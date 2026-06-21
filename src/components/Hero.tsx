@@ -3,7 +3,7 @@ import GitHubIcon from "./GitHubIcon";
 import GitHubStars from "./GitHubStars";
 import { useState, useEffect } from "react";
 
-const PHRASES = ["Source-available", "Free to run", "Becomes Apache 2.0"];
+const PHRASES = ["Open core", "Free to use", "Local by default", "Self-hosted"];
 
 const TYPING_MS = 45;
 const DELETING_MS = 30;
