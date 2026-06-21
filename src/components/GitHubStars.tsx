@@ -13,8 +13,8 @@ export default function GitHubStars({ className = "" }: { className?: string }) 
     let alive = true;
     fetch(`https://api.github.com/repos/${REPO}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (alive && d && typeof d.stargazers_count === "number") {
+      .then((d: unknown) => {
+        if (alive && isGitHubRepo(d)) {
           setStars(d.stargazers_count);
         }
       })
@@ -37,5 +37,14 @@ export default function GitHubStars({ className = "" }: { className?: string }) 
       <Star size={12} className="text-amber-400" />
       {label}
     </a>
+  );
+}
+
+function isGitHubRepo(value: unknown): value is { stargazers_count: number } {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "stargazers_count" in value &&
+    typeof value.stargazers_count === "number"
   );
 }

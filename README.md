@@ -1,6 +1,6 @@
 # atelier-landing
 
-Marketing and documentation landing page for [Atelier](https://github.com/atelier-ws/atelier) — the open-source runtime engineering platform for AI agents.
+Marketing and documentation landing page for [Atelier](https://github.com/atelier-ws/atelier) — the source-available runtime engineering platform for AI agents.
 
 Built with [Astro](https://astro.build) + React + Tailwind CSS.
 
@@ -63,6 +63,57 @@ Rollup payload shape:
 The Function hashes install/session identifiers before storage, dedupes by
 session, bounds metric values, and refreshes the public KV aggregate after each
 accepted rollup.
+
+## Pro License Delivery
+
+The authoritative signer is the separate `services/license-issuer` Worker in
+the parent Atelier repository. It receives Stripe webhooks, signs the exact
+two-segment token format accepted by the CLI, and stores tokens in the
+`atelier-licenses` D1 database. This landing Worker never mints licenses.
+
+After checkout, `/license/success` verifies the Stripe session and reads the
+issued token through its `LICENSE_DB` binding. `/license/recover` resends active
+tokens through Cloudflare Email Service without revealing whether an address
+exists in the database.
+
+Apply the landing-side recovery tables to the telemetry database:
+
+```bash
+npx wrangler d1 execute atelier-telemetry --remote \
+  --file migrations/0004_license_issuance.sql
+npx wrangler d1 execute atelier-telemetry --remote \
+  --file migrations/0005_remove_duplicate_license_issuer.sql
+npx wrangler d1 execute atelier-telemetry --remote \
+  --file migrations/0006_license_checkout_delivery.sql
+```
+
+Enable Email Sending for the sender domain and keep the `EMAIL` binding in the
+Wrangler config:
+
+```bash
+npx wrangler email sending enable atelier.ws
+npx wrangler email sending dns get atelier.ws
+```
+
+Configure the Stripe API secret used to verify checkout sessions:
+
+```bash
+npx wrangler secret put STRIPE_SECRET_KEY
+```
+
+In Stripe:
+
+- Replace `PRO_MONTHLY_CHECKOUT_URL` and `PRO_YEARLY_CHECKOUT_URL` with live
+  Payment Links before production deployment.
+- Set both Payment Links' post-payment redirect to
+  `https://atelier.ws/license/success?session_id={CHECKOUT_SESSION_ID}`.
+- Keep the existing `services/license-issuer` Stripe webhook enabled. Do not
+  create a second signing webhook on the landing Worker.
+- `STRIPE_SECRET_KEY` is used only to verify a paid Checkout Session before the
+  landing page reveals its matching token.
+
+Recovery is rate-limited per hashed email address. Checkout-session claims are
+available for 48 hours; after that, recovery email is required.
 
 ## Deploy
 

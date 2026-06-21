@@ -3,7 +3,8 @@ import GitHubIcon from "./GitHubIcon";
 import GitHubStars from "./GitHubStars";
 import { useState, useEffect } from "react";
 
-const PHRASES = ["Open-source agent runtime", "Apache 2.0"];
+const PHRASES = ["Source-available", "Free to run", "Becomes Apache 2.0"];
+
 const TYPING_MS = 45;
 const DELETING_MS = 30;
 const PAUSE_MS = 2000;

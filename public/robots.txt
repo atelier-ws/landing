@@ -1,4 +1,4 @@
-# atelier.ws - open-source coding-agent runtime.
+# atelier.ws - source-available coding-agent runtime.
 # AI answer/search engines are explicitly welcome (we want to be cited).
 # Pure training-only scrapers are disallowed.
 

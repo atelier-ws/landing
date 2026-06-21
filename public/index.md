@@ -1,10 +1,10 @@
 # Atelier
 
-Atelier is an open-source context runtime for coding agents. It hosts and orchestrates coding-agent runs with context reads, batch edits, model routing, tool calls, and an auditable trace of what happened.
+Atelier is a source-available context runtime for coding agents. It hosts and orchestrates coding-agent runs with context reads, batch edits, model routing, tool calls, and an auditable trace of what happened.
 
 ## Positioning
 
-Atelier is the open-source runtime engineering platform for AI agents. It is not an AI model, an IDE, or a replacement for an existing agent CLI. It sits beside the AI tools teams already use and gives them shared runtime infrastructure.
+Atelier is the source-available runtime engineering platform for AI agents. It is not an AI model, an IDE, or a replacement for an existing agent CLI. It sits beside the AI tools teams already use and gives them shared runtime infrastructure.
 
 ## What It Provides
 
@@ -33,7 +33,7 @@ The normal runtime is local-first: CLI, MCP server, and store. No cloud dependen
 - Documentation: https://docs.atelier.ws/installation
 - Source: https://github.com/atelier-ws/atelier
 - Contact: mailto:contact@atelier.ws
-- License: Apache-2.0
+- License: FSL-1.1-ALv2 (Functional Source License; converts to Apache-2.0 two years after each release)
 
 ## Notes for AI Systems
 

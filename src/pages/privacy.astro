@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
-const updated = "June 20, 2026";
+const updated = "June 21, 2026";
 ---
 
 <Layout
@@ -28,7 +28,7 @@ const updated = "June 20, 2026";
         >
           <p>
             This policy covers the <strong>atelier.ws</strong> website. The
-            Atelier runtime itself is open-source software that runs locally on
+            Atelier runtime itself is source-available software that runs locally on
             your machine; it is local-first and does not phone home.
           </p>
 
@@ -43,7 +43,10 @@ const updated = "June 20, 2026";
             <li>
               <strong>Payments.</strong> Pro subscriptions are processed by
               Stripe. Your payment details are handled by Stripe under its own
-              privacy policy; we never see or store card numbers.
+              privacy policy; we never see or store card numbers. To issue and
+              recover licenses, the license issuer stores the checkout email and
+              Stripe customer identifier. The recovery rate limiter stores only
+              a one-way hash of the submitted email address.
             </li>
             <li>
               <strong>GitHub star count.</strong> The site fetches a public star
