@@ -42,6 +42,7 @@ type RollupPayload = {
 };
 
 type PublicMetrics = {
+  gross_usd: number;
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
@@ -188,7 +189,8 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .prepare(
       `
       SELECT
-        COALESCE(SUM(saved_usd + carry_usd), 0) AS saved_usd,
+        COALESCE(SUM(saved_usd + carry_usd), 0) AS gross_usd,
+        COALESCE(SUM(saved_usd), 0) AS saved_usd,
         COALESCE(SUM(tokens_saved + carry_tokens), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
         COALESCE(SUM(turns), 0) AS turns,
@@ -201,6 +203,7 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .first<Record<string, unknown>>();
 
   return {
+    gross_usd: roundMoney(numberValue(row?.gross_usd)),
     saved_usd: roundMoney(numberValue(row?.saved_usd)),
     tokens_saved: intValue(row?.tokens_saved),
     calls_avoided: intValue(row?.calls_avoided),

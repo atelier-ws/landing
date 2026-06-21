@@ -13,11 +13,21 @@ const EMPTY_PAUSE_MS = 400;
 type Phase = "typing" | "deleting";
 
 type PublicMetrics = {
+  gross_usd: number;
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
   turns: number;
   sessions: number;
+};
+
+const MOCK_METRICS: PublicMetrics = {
+  gross_usd: 1243.5,
+  saved_usd: 784.2,
+  tokens_saved: 340_000,
+  calls_avoided: 553,
+  turns: 12_000,
+  sessions: 840,
 };
 
 function usePrefersReducedMotion() {
@@ -32,6 +42,36 @@ function usePrefersReducedMotion() {
   return prefersReduced;
 }
 
+function useAnimatedTo(target: number, durationMs: number): number {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (target === 0) {
+      setValue(0);
+      return;
+    }
+
+    const startTime = performance.now();
+    let rafId: number;
+
+    function tick(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / durationMs, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(target * eased);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [target, durationMs]);
+
+  return value;
+}
+
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
   const [metrics, setMetrics] = useState<PublicMetrics | null>(null);
@@ -44,6 +84,11 @@ export default function Hero() {
   const target = PHRASES[phraseIndex];
 
   useEffect(() => {
+    if (import.meta.env.DEV) {
+      setMetrics(MOCK_METRICS);
+      return;
+    }
+
     const controller = new AbortController();
     fetch("/api/public-metrics", { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
@@ -133,6 +178,10 @@ export default function Hero() {
 
           {metrics && (
             <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border border-neutral-300 bg-white/70 px-3 py-2 text-[11px] text-neutral-500 sm:text-xs">
+              <span className="font-bold text-orange-600">
+                {formatCompactUsd(metrics.gross_usd)} cost
+              </span>
+              <span className="text-neutral-300">|</span>
               <span className="font-bold text-emerald-600">
                 {formatUsd(metrics.saved_usd)} saved
               </span>
@@ -159,11 +208,13 @@ export default function Hero() {
 function normalizeMetrics(payload: unknown): PublicMetrics | null {
   if (!payload || typeof payload !== "object") return null;
   const candidate = payload as Record<string, unknown>;
+  const gross_usd = numberValue(candidate.gross_usd);
   const saved_usd = numberValue(candidate.saved_usd);
   const tokens_saved = intValue(candidate.tokens_saved);
   const calls_avoided = intValue(candidate.calls_avoided);
   if (saved_usd <= 0 && tokens_saved <= 0 && calls_avoided <= 0) return null;
   return {
+    gross_usd,
     saved_usd,
     tokens_saved,
     calls_avoided,
@@ -200,4 +251,12 @@ function formatCompact(value: number): string {
 
 function trimDecimal(value: number): string {
   return value.toFixed(1).replace(/\.0$/, "");
+}
+
+function formatCompactUsd(value: number): string {
+  if (value < 10) return `$${value.toFixed(2)}`;
+  if (value < 1000) return `$${Math.floor(value)}`;
+  if (value < 1_000_000) return `$${trimDecimal(value / 1000)}K`;
+  if (value < 1_000_000_000) return `$${trimDecimal(value / 1_000_000)}M`;
+  return `$${trimDecimal(value / 1_000_000_000)}B`;
 }
