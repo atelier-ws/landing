@@ -1,6 +1,6 @@
 # atelier.ws - source-available coding-agent runtime.
-# AI answer/search engines are explicitly welcome (we want to be cited).
-# Pure training-only scrapers are disallowed.
+# AI answer, search, and major model crawlers are explicitly welcome.
+# Selected high-volume bulk scrapers are disallowed below.
 
 User-agent: *
 Allow: /

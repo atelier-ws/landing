@@ -11,8 +11,17 @@ interface Props {
   description?: string;
   canonicalPath?: string;
   image?: string;
+  imageAlt?: string;
   breadcrumbs?: Breadcrumb[];
   robots?: string;
+  ogType?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  articleSection?: string;
+  articleTags?: string[];
+  keywords?: string[];
+  structuredData?: Record<string, unknown>[];
+  markdownPath?: string;
 }
 
 const SITE_URL = "https://atelier.ws";
@@ -21,23 +30,41 @@ const DEFAULT_TITLE =
   "Atelier - Source-Available MCP Runtime for Claude Code & Coding Agents";
 const DEFAULT_DESCRIPTION =
   "Atelier is the source-available MCP runtime for Claude Code and coding agents: code intelligence, model routing, cost tracking, and auditable traces.";
-// Canonical product description for the SoftwareApplication node. Kept separate
-// from the per-page meta `description` so the schema never inherits page copy.
 const SOFTWARE_DESCRIPTION =
   "Atelier is a source-available runtime for coding agents: an MCP server and SDK middleware for code intelligence, model routing, cost tracking, and auditable run traces. Runs locally alongside Claude Code, Codex, Cursor, and any MCP host.";
+const DEFAULT_KEYWORDS = [
+  "Atelier",
+  "coding agents",
+  "MCP server",
+  "AI agent runtime",
+  "code intelligence",
+  "model routing",
+  "cost tracking",
+  "context engineering",
+];
 
 const {
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
   canonicalPath = "/",
   image = "/og.png",
+  imageAlt = "Atelier - source-available runtime for coding agents",
   breadcrumbs,
   robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+  ogType = "website",
+  publishedTime,
+  modifiedTime,
+  articleSection,
+  articleTags = [],
+  keywords = DEFAULT_KEYWORDS,
+  structuredData = [],
+  markdownPath,
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, SITE_URL).toString();
 const imageUrl = new URL(image, SITE_URL).toString();
-const buildDate = new Date().toISOString().slice(0, 10);
+const alternateMarkdownPath =
+  markdownPath ?? (canonicalPath === "/" ? "/index.md" : undefined);
 
 const graph: Record<string, unknown>[] = [
   {
@@ -73,7 +100,6 @@ const graph: Record<string, unknown>[] = [
     codeRepository: "https://github.com/atelier-ws/atelier",
     license: "https://fsl.software/",
     isAccessibleForFree: true,
-    dateModified: buildDate,
     description: SOFTWARE_DESCRIPTION,
     offers: [
       {
@@ -135,7 +161,9 @@ if (breadcrumbs && breadcrumbs.length > 0) {
   });
 }
 
-const structuredData = {
+graph.push(...structuredData);
+
+const jsonLd = {
   "@context": "https://schema.org",
   "@graph": graph,
 };
@@ -151,10 +179,30 @@ const structuredData = {
     <meta name="author" content="Atelier" />
     <meta name="application-name" content="Atelier" />
     <meta name="theme-color" content="#f7f8fb" />
-    <meta name="keywords" content="Atelier, coding agents, MCP server, AI agent runtime, code intelligence, model routing, cost tracking, context engineering" />
+    <meta name="keywords" content={keywords.join(", ")} />
     <link rel="canonical" href={canonicalUrl} />
-    <link rel="alternate" type="text/markdown" href="/index.md" title="Atelier landing page in Markdown" />
-    <link rel="alternate" type="text/plain" href="/llms.txt" title="Atelier LLM-readable summary" />
+    {
+      alternateMarkdownPath && (
+        <link
+          rel="alternate"
+          type="text/markdown"
+          href={alternateMarkdownPath}
+          title="Markdown version"
+        />
+      )
+    }
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      href="/rss.xml"
+      title="Atelier Blog RSS"
+    />
+    <link
+      rel="alternate"
+      type="text/plain"
+      href="/llms.txt"
+      title="Atelier LLM-readable summary"
+    />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -162,26 +210,30 @@ const structuredData = {
     <link rel="me" href="https://github.com/atelier-ws/atelier" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Atelier" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Atelier - source-available context runtime for coding agents" />
+    <meta property="og:image:alt" content={imageAlt} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {articleSection && <meta property="article:section" content={articleSection} />}
+    {articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
-    <meta name="twitter:image:alt" content="Atelier - source-available context runtime for coding agents" />
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />
   </head>
   <body class="bg-[#f7f8fb] text-neutral-950 font-mono antialiased">
     <slot />
     <script>
-      // Scroll-reveal: observe [data-reveal] elements and add .revealed class
       if (typeof IntersectionObserver !== "undefined") {
         const observer = new IntersectionObserver(
           (entries) => {
@@ -192,11 +244,16 @@ const structuredData = {
               }
             });
           },
-          { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
+          // A ratio threshold can never be reached by elements taller than the
+          // viewport (such as full blog articles). Reveal as soon as any part
+          // enters the observed area instead.
+          { threshold: 0, rootMargin: "0px 0px -40px 0px" },
         );
-        // Script is at the end of <body>, so [data-reveal] elements already
-        // exist — observe immediately rather than waiting for DOMContentLoaded.
         document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+      } else {
+        document.querySelectorAll("[data-reveal]").forEach((el) => {
+          el.classList.add("revealed");
+        });
       }
     </script>
   </body>

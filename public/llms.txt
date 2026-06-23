@@ -12,6 +12,14 @@ Atelier helps coding agents spend less effort rediscovering codebase structure. 
 - [Documentation index](https://docs.atelier.ws/): docs for CLI, troubleshooting, production readiness, SDK, MCP, hosts, strategy, and roadmap.
 - [Source repository](https://github.com/atelier-ws/atelier): source-available (FSL-1.1-ALv2) source, benchmark reports, issues, releases, and implementation details.
 
+## Engineering Blog
+
+- [Blog index](https://atelier.ws/blog): first-party engineering articles about Atelier and coding-agent runtimes.
+- [How Atelier works](https://atelier.ws/blog/how-atelier-works): MCP tools, code intelligence, structured edits, memory, and context lifecycle.
+- [How Atelier saves money](https://atelier.ws/blog/how-atelier-saves-money): discovery turns, source projection, output budgets, deduplication, and conservative savings accounting.
+- [Inside Atelier: technology and design ideas](https://atelier.ws/blog/inside-atelier-technology-and-ideas): complete technology, capability, and design-principle inventory.
+- [RSS feed](https://atelier.ws/rss.xml): machine-readable feed of new posts.
+
 ## Key Facts
 
 - Product name: Atelier.

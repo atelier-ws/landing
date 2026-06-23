@@ -148,9 +148,7 @@ const articleStructuredData = {
   <Footer />
   <div class="si" aria-hidden="true" data-slugs={JSON.stringify(sectionSlugs)} data-headings={JSON.stringify(headingsBySlug)}>
     <div class="si-label" id="si-label">{dateFmt(post.data.date)}</div>
-    <div class="si-track">
-      <div class="si-thumb" id="si-thumb"></div>
-    </div>
+    <div class="si-track"></div>
   </div>
   <script is:inline>
     (function() {
@@ -164,24 +162,39 @@ const articleStructuredData = {
       if (slugs.length === 0) return;
 
       var label = document.getElementById("si-label");
-      var thumb = document.getElementById("si-thumb");
-      if (!label || !thumb) return;
+      if (!label) return;
 
       var track = el.querySelector(".si-track");
+      var hoverIdx = -1;
+
       slugs.forEach(function(slug, i) {
         var mark = document.createElement("span");
         mark.className = "si-mark";
         mark.setAttribute("data-idx", i);
+        // position proportionally along the track
+        var pct = slugs.length > 1 ? (i / (slugs.length - 1)) * 100 : 50;
+        mark.style.top = pct + "%";
+
+        // hover – show heading text in label
+        mark.addEventListener("mouseenter", function() {
+          hoverIdx = i;
+          label.textContent = textLookup[slugs[i]] || "";
+        });
+        mark.addEventListener("mouseleave", function() {
+          hoverIdx = -1;
+          update();
+        });
+        // click – smooth-scroll to heading
+        mark.addEventListener("click", function() {
+          var h = document.getElementById(slugs[i]);
+          if (h) h.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
         track.appendChild(mark);
       });
       var marks = track.querySelectorAll(".si-mark");
 
       function update() {
-        var scrollY = window.scrollY;
-        var docH = document.documentElement.scrollHeight - window.innerHeight;
-        var pct = docH > 0 ? (scrollY / docH) * 100 : 0;
-        thumb.style.top = pct + "%";
-
         var active = -1;
         for (var i = slugs.length - 1; i >= 0; i--) {
           var h = document.getElementById(slugs[i]);
@@ -196,7 +209,8 @@ const articleStructuredData = {
           m.classList.toggle("active", idx === active);
         });
 
-        if (active >= 0) {
+        // only update label when not hovering a dot
+        if (hoverIdx < 0 && active >= 0) {
           label.textContent = textLookup[slugs[active]] || "";
         }
       }

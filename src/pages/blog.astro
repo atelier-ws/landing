@@ -15,31 +15,12 @@ const dateFmt = (date: Date) =>
     day: "numeric",
   });
 
-// Render each post's full content for inline display, storing Content + headings separately
+// Render each post's full content for inline display.
 const renderedPosts = await Promise.all(
   posts.map(async (post) => {
-    const { Content, headings } = await render(post);
-    const sectionHeadings = headings.filter((h) => h.depth <= 3);
-    return {
-      post,
-      Content,
-      sectionHeadings,
-      sectionSlugs: sectionHeadings.map((h) => h.slug),
-    };
+    const { Content } = await render(post);
+    return { post, Content };
   }),
-);
-
-// embed (slug, date) pairs so the scroll script can look up dates
-// without any DOM traversal (closest / querySelector / date parsing)
-const slugDateEntries = renderedPosts.flatMap((p) =>
-  p.sectionSlugs.map((slug) => ({
-    s: slug,
-    d: p.post.data.date.toISOString(),
-  })),
-);
-const allSlugs = renderedPosts.flatMap((p) => p.sectionSlugs);
-const datesBySlug = Object.fromEntries(
-  slugDateEntries.map((e) => [e.s, e.d]),
 );
 
 const blogStructuredData = {
@@ -113,7 +94,9 @@ const blogStructuredData = {
                       </>
                     )}
                   </div>
-                  <h2>{post.data.title}</h2>
+                  <h2>
+                    <a href={`/blog/${post.id}`}>{post.data.title}</a>
+                  </h2>
                   <p class="blog-entry-desc">{post.data.description}</p>
                   <ul class="post-tags" aria-label="Topics">
                     {post.data.tags.map((tag) => (
@@ -132,86 +115,250 @@ const blogStructuredData = {
     </div>
   </main>
   <Footer />
-  <div class="si" aria-hidden="true" data-slugs={JSON.stringify(allSlugs)} data-dates={JSON.stringify(datesBySlug)}>
-    <div class="si-label" id="si-label">
-      {renderedPosts.length > 0 ? dateFmt(renderedPosts[0].post.data.date) : ""}
-    </div>
-    <div class="si-track">
-      <div class="si-thumb" id="si-thumb"></div>
-    </div>
-  </div>
+  {
+    renderedPosts.length > 0 && (
+      <nav
+        class="blog-timeline"
+        data-blog-timeline
+        aria-label="Jump to a blog post by publication date"
+      >
+        <button
+          type="button"
+          class="blog-timeline-label"
+          aria-label={`Scroll to ${renderedPosts[0].post.data.title}`}
+        >
+          <time>{dateFmt(renderedPosts[0].post.data.date)}</time>
+          <span>{renderedPosts[0].post.data.title}</span>
+        </button>
+        <div class="blog-timeline-track">
+          <span class="blog-timeline-thumb" aria-hidden="true"></span>
+          {renderedPosts.map(({ post }, index) => {
+            const position =
+              renderedPosts.length > 1
+                ? (index / (renderedPosts.length - 1)) * 100
+                : 50;
+            const date = dateFmt(post.data.date);
+            return (
+              <button
+                type="button"
+                class="blog-timeline-dot"
+                style={`top: ${position}%`}
+                data-target={post.id}
+                data-date={date}
+                data-title={post.data.title}
+                aria-label={`Scroll to ${date}: ${post.data.title}`}
+              />
+            );
+          })}
+        </div>
+      </nav>
+    )
+  }
   <script is:inline>
     (function () {
-      var el = document.querySelector(".si");
-      if (!el) return;
-      var slugs, dateLookup;
-      try {
-        slugs = JSON.parse(el.getAttribute("data-slugs") || "[]");
-        dateLookup = JSON.parse(el.getAttribute("data-dates") || "{}");
-      } catch (e) {
-        return;
+      var timeline = document.querySelector("[data-blog-timeline]");
+      if (!timeline) return;
+
+      var track = timeline.querySelector(".blog-timeline-track");
+      var label = timeline.querySelector(".blog-timeline-label");
+      var labelDate = label && label.querySelector("time");
+      var labelTitle = label && label.querySelector("span");
+      var dots = Array.prototype.slice.call(
+        timeline.querySelectorAll(".blog-timeline-dot"),
+      );
+      if (!track || !labelDate || !labelTitle || dots.length === 0) return;
+
+      var activeIndex = 0;
+      var previewIndex = -1;
+      var dragging = false;
+      var ticking = false;
+      var reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      function targetFor(dot) {
+        return document.getElementById(dot.getAttribute("data-target") || "");
       }
-      if (slugs.length === 0) return;
 
-      var label = document.getElementById("si-label");
-      var thumb = document.getElementById("si-thumb");
-      if (!label || !thumb) return;
+      function maximumScroll() {
+        return Math.max(
+          0,
+          document.documentElement.scrollHeight - window.innerHeight,
+        );
+      }
 
-      var track = el.querySelector(".si-track");
-      slugs.forEach(function (slug, i) {
-        var mark = document.createElement("span");
-        mark.className = "si-mark";
-        mark.setAttribute("data-idx", i);
-        track.appendChild(mark);
-      });
+      function targetTop(dot) {
+        var target = targetFor(dot);
+        if (!target) return 0;
+        return Math.max(
+          0,
+          Math.min(
+            maximumScroll(),
+            target.getBoundingClientRect().top + window.scrollY - 96,
+          ),
+        );
+      }
 
-      var marks = track.querySelectorAll(".si-mark");
+      function positionDots() {
+        var limit = maximumScroll();
+        dots.forEach(function (dot) {
+          var position = limit > 0 ? (targetTop(dot) / limit) * 100 : 50;
+          dot.style.top = position + "%";
+        });
+        showLabel(previewIndex >= 0 ? previewIndex : activeIndex);
+      }
+
+      function showLabel(index) {
+        var dot = dots[index];
+        if (!dot) return;
+        labelDate.textContent = dot.getAttribute("data-date") || "";
+        labelTitle.textContent = dot.getAttribute("data-title") || "";
+        label.setAttribute(
+          "aria-label",
+          "Scroll to " + (dot.getAttribute("data-title") || "blog post"),
+        );
+        timeline.style.setProperty("--label-position", dot.style.top);
+      }
+
+      function setActive(index) {
+        activeIndex = index;
+        dots.forEach(function (dot, dotIndex) {
+          var isActive = dotIndex === index;
+          dot.classList.toggle("is-active", isActive);
+          if (isActive) {
+            dot.setAttribute("aria-current", "date");
+          } else {
+            dot.removeAttribute("aria-current");
+          }
+        });
+        if (previewIndex < 0 && !dragging) showLabel(index);
+      }
 
       function update() {
-        var scrollY = window.scrollY;
-        var docH = document.documentElement.scrollHeight - window.innerHeight;
-        var pct = docH > 0 ? (scrollY / docH) * 100 : 0;
-        thumb.style.top = pct + "%";
-
-        var active = -1;
-        for (var i = slugs.length - 1; i >= 0; i--) {
-          var h = document.getElementById(slugs[i]);
-          if (h && h.getBoundingClientRect().top <= 120) {
-            active = i;
+        var nextIndex = 0;
+        for (var i = dots.length - 1; i >= 0; i--) {
+          var target = targetFor(dots[i]);
+          if (target && target.getBoundingClientRect().top <= 160) {
+            nextIndex = i;
             break;
           }
         }
-        if (active < 0 && slugs.length > 0) active = 0;
-
-        marks.forEach(function (m, idx) {
-          m.classList.toggle("active", idx === active);
-        });
-
-        if (active >= 0) {
-          var dateStr = dateLookup[slugs[active]];
-          if (dateStr) {
-            var d = new Date(dateStr);
-            if (!isNaN(d)) {
-              label.textContent = d.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              });
-            }
-          }
-        }
+        setActive(nextIndex);
+        var limit = maximumScroll();
+        var position = limit > 0 ? (window.scrollY / limit) * 100 : 0;
+        timeline.style.setProperty("--scroll-position", position + "%");
       }
 
-      var ticking = false;
-      window.addEventListener("scroll", function () {
-        if (!ticking) {
+      function scrollToDot(index) {
+        window.scrollTo({
+          top: targetTop(dots[index]),
+          behavior: reducedMotion ? "auto" : "smooth",
+        });
+      }
+
+      function closestDot(ratio) {
+        var closestIndex = 0;
+        var closestDistance = Infinity;
+        dots.forEach(function (dot, index) {
+          var position = (parseFloat(dot.style.top) || 0) / 100;
+          var distance = Math.abs(position - ratio);
+          if (distance < closestDistance) {
+            closestIndex = index;
+            closestDistance = distance;
+          }
+        });
+        return closestIndex;
+      }
+
+      function scrub(clientY) {
+        var bounds = track.getBoundingClientRect();
+        var ratio = Math.max(
+          0,
+          Math.min(1, (clientY - bounds.top) / bounds.height),
+        );
+        dragging = true;
+        previewIndex = closestDot(ratio);
+        timeline.classList.add("is-interacting");
+        showLabel(previewIndex);
+        window.scrollTo({ top: ratio * maximumScroll(), behavior: "auto" });
+      }
+
+      dots.forEach(function (dot, index) {
+        dot.addEventListener("mouseenter", function () {
+          previewIndex = index;
+          timeline.classList.add("is-interacting");
+          showLabel(index);
+        });
+        dot.addEventListener("mouseleave", function () {
+          if (dragging) return;
+          previewIndex = -1;
+          timeline.classList.remove("is-interacting");
+          showLabel(activeIndex);
+        });
+        dot.addEventListener("focus", function () {
+          previewIndex = index;
+          timeline.classList.add("is-interacting");
+          showLabel(index);
+        });
+        dot.addEventListener("blur", function () {
+          previewIndex = -1;
+          timeline.classList.remove("is-interacting");
+          showLabel(activeIndex);
+        });
+        dot.addEventListener("click", function () {
+          scrollToDot(index);
+        });
+      });
+
+      label.addEventListener("click", function () {
+        scrollToDot(previewIndex >= 0 ? previewIndex : activeIndex);
+      });
+
+      track.addEventListener("pointerdown", function (event) {
+        if (event.target.closest(".blog-timeline-dot")) return;
+        event.preventDefault();
+        track.setPointerCapture(event.pointerId);
+        scrub(event.clientY);
+      });
+      track.addEventListener("pointermove", function (event) {
+        if (track.hasPointerCapture(event.pointerId)) scrub(event.clientY);
+      });
+      track.addEventListener("pointerup", function (event) {
+        if (track.hasPointerCapture(event.pointerId)) {
+          track.releasePointerCapture(event.pointerId);
+        }
+        dragging = false;
+        previewIndex = -1;
+        timeline.classList.remove("is-interacting");
+        update();
+      });
+      track.addEventListener("pointercancel", function () {
+        dragging = false;
+        previewIndex = -1;
+        timeline.classList.remove("is-interacting");
+        update();
+      });
+
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (ticking) return;
+          ticking = true;
           requestAnimationFrame(function () {
             update();
             ticking = false;
           });
-          ticking = true;
-        }
-      });
+        },
+        { passive: true },
+      );
+
+      window.addEventListener("resize", positionDots, { passive: true });
+      window.addEventListener("load", positionDots, { once: true });
+      if (typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(positionDots).observe(document.body);
+      }
+
+      positionDots();
       update();
     })();
   </script>

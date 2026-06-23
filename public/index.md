@@ -19,6 +19,13 @@ Atelier is the source-available runtime engineering platform for AI agents. It i
 
 Atelier is designed for Claude Code, Codex, Copilot, Cursor, opencode, Hermes Agent, LangChain, the OpenAI SDK, Gemini ADK, and MCP-compatible hosts.
 
+## Engineering Blog
+
+- [How Atelier works](https://atelier.ws/blog/how-atelier-works)
+- [How Atelier saves money](https://atelier.ws/blog/how-atelier-saves-money)
+- [Inside Atelier: technology and design ideas](https://atelier.ws/blog/inside-atelier-technology-and-ideas)
+- [RSS feed](https://atelier.ws/rss.xml)
+
 ## Install
 
 ```bash
