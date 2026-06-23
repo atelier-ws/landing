@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
+import BlogTimeline from "../../components/BlogTimeline.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -33,11 +34,21 @@ const publishedTime = post.data.date.toISOString();
 const modifiedTime = post.data.updated.toISOString();
 const wasUpdated = post.data.updated.valueOf() !== post.data.date.valueOf();
 const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
-const sectionHeadings = headings.filter(h => h.depth <= 3);
-const sectionSlugs = sectionHeadings.map(h => h.slug);
-const headingsBySlug = Object.fromEntries(
-  sectionHeadings.map(h => [h.slug, h.text]),
-);
+const sectionHeadings = headings;
+const timelineItems = [
+  {
+    target: post.id,
+    meta: "H1",
+    title: post.data.title,
+    level: 1,
+  },
+  ...sectionHeadings.map((heading) => ({
+    target: heading.slug,
+    meta: `H${heading.depth}`,
+    title: heading.text,
+    level: heading.depth,
+  })),
+];
 
 const articleStructuredData = {
   "@type": "BlogPosting",
@@ -93,7 +104,7 @@ const articleStructuredData = {
 >
   <Nav client:load />
   <main id="main-content">
-    <article class="post-page">
+    <article class="post-page" id={post.id}>
       <div class="post-header">
         <a href="/blog" class="post-back">&larr; Back to all posts</a>
         <div class="post-byline">
@@ -146,83 +157,8 @@ const articleStructuredData = {
     }
   </main>
   <Footer />
-  <div class="si" aria-hidden="true" data-slugs={JSON.stringify(sectionSlugs)} data-headings={JSON.stringify(headingsBySlug)}>
-    <div class="si-label" id="si-label">{dateFmt(post.data.date)}</div>
-    <div class="si-track"></div>
-  </div>
-  <script is:inline>
-    (function() {
-      var el = document.querySelector(".si");
-      if (!el) return;
-      var slugs, textLookup;
-      try {
-        slugs = JSON.parse(el.getAttribute("data-slugs") || "[]");
-        textLookup = JSON.parse(el.getAttribute("data-headings") || "{}");
-      } catch(e) { return; }
-      if (slugs.length === 0) return;
-
-      var label = document.getElementById("si-label");
-      if (!label) return;
-
-      var track = el.querySelector(".si-track");
-      var hoverIdx = -1;
-
-      slugs.forEach(function(slug, i) {
-        var mark = document.createElement("span");
-        mark.className = "si-mark";
-        mark.setAttribute("data-idx", i);
-        // position proportionally along the track
-        var pct = slugs.length > 1 ? (i / (slugs.length - 1)) * 100 : 50;
-        mark.style.top = pct + "%";
-
-        // hover – show heading text in label
-        mark.addEventListener("mouseenter", function() {
-          hoverIdx = i;
-          label.textContent = textLookup[slugs[i]] || "";
-        });
-        mark.addEventListener("mouseleave", function() {
-          hoverIdx = -1;
-          update();
-        });
-        // click – smooth-scroll to heading
-        mark.addEventListener("click", function() {
-          var h = document.getElementById(slugs[i]);
-          if (h) h.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-
-        track.appendChild(mark);
-      });
-      var marks = track.querySelectorAll(".si-mark");
-
-      function update() {
-        var active = -1;
-        for (var i = slugs.length - 1; i >= 0; i--) {
-          var h = document.getElementById(slugs[i]);
-          if (h && h.getBoundingClientRect().top <= 120) {
-            active = i;
-            break;
-          }
-        }
-        if (active < 0 && slugs.length > 0) active = 0;
-
-        marks.forEach(function(m, idx) {
-          m.classList.toggle("active", idx === active);
-        });
-
-        // only update label when not hovering a dot
-        if (hoverIdx < 0 && active >= 0) {
-          label.textContent = textLookup[slugs[active]] || "";
-        }
-      }
-
-      var ticking = false;
-      window.addEventListener("scroll", function() {
-        if (!ticking) {
-          requestAnimationFrame(function() { update(); ticking = false; });
-          ticking = true;
-        }
-      });
-      update();
-    })();
-  </script>
+  <BlogTimeline
+    items={timelineItems}
+    ariaLabel="Jump to a section of this article"
+  />
 </Layout>

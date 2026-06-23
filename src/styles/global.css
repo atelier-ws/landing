@@ -669,18 +669,32 @@ a:hover {
 }
 
 .blog-entry-header h2 a {
+  position: relative;
   color: inherit;
   text-decoration: none;
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.16em;
-  transition: color 150ms ease;
+  transition: color 250ms ease;
+}
+
+.blog-entry-header h2 a::after {
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #6a39b3;
+  content: "";
+  transition: width 250ms ease;
 }
 
 .blog-entry-header h2 a:hover,
 .blog-entry-header h2 a:focus-visible {
   color: #6a39b3;
   outline: none;
-  text-decoration: underline;
+}
+
+.blog-entry-header h2 a:hover::after,
+.blog-entry-header h2 a:focus-visible::after {
+  width: 100%;
 }
 
 .blog-entry-desc {
@@ -729,7 +743,8 @@ a:hover {
   pointer-events: auto;
 }
 
-.blog-timeline-label time {
+.blog-timeline-label time,
+.blog-timeline-label small {
   display: block;
   color: #6a39b3;
   font-family: 'JetBrains Mono', monospace;
@@ -737,6 +752,10 @@ a:hover {
   font-weight: 700;
   letter-spacing: 0.025em;
   white-space: nowrap;
+}
+
+.blog-timeline-label small {
+  text-transform: uppercase;
 }
 
 .blog-timeline-label span {
@@ -839,6 +858,19 @@ a:hover {
     box-shadow 150ms ease;
 }
 
+.blog-timeline-dot[data-level="1"]::before {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.blog-timeline-dot[data-level="3"]::before,
+.blog-timeline-dot[data-level="4"]::before,
+.blog-timeline-dot[data-level="5"]::before,
+.blog-timeline-dot[data-level="6"]::before {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
 .blog-timeline-dot:hover::before,
 .blog-timeline-dot:focus-visible::before {
   width: 0.9rem;
@@ -897,77 +929,6 @@ html:has(.blog-timeline) body::-webkit-scrollbar {
   .blog-timeline *::before {
     transition: none;
   }
-}
-
-/* ---------------------------------------------------------------------------
-   Individual article section indicator
---------------------------------------------------------------------------- */
-.si {
-  position: fixed;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  pointer-events: none;
-  user-select: none;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.si-label {
-  font-size: 0.55rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: #6a39b3;
-  white-space: nowrap;
-  text-align: center;
-  max-width: 5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: opacity 0.15s ease;
-}
-
-.si-track {
-  position: relative;
-  width: 2px;
-  height: 40vh;
-  min-height: 6rem;
-  background: #e5e5e5;
-  border-radius: 1px;
-}
-
-.si-mark {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #c7c7c7;
-  pointer-events: auto;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 1;
-}
-
-.si-mark:hover {
-  background: #a0a0a0;
-  transform: translate(-50%, -50%) scale(1.25);
-  box-shadow: 0 0 0 4px rgba(106, 57, 179, 0.1);
-}
-
-.si-mark.active {
-  background: #6a39b3;
-  transform: translate(-50%, -50%) scale(1.35);
-  box-shadow: 0 0 0 4px rgba(106, 57, 179, 0.18);
-  z-index: 2;
-}
-
-@media (max-width: 768px) {
-  .si { display: none; }
 }
 
 /* ---------------------------------------------------------------------------

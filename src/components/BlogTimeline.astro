@@ -1,0 +1,262 @@
+---
+interface TimelineItem {
+  target: string;
+  meta: string;
+  title: string;
+  level?: number;
+}
+
+interface Props {
+  items: TimelineItem[];
+  ariaLabel: string;
+}
+
+const { items, ariaLabel } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <nav
+      class="blog-timeline"
+      data-blog-timeline
+      aria-label={ariaLabel}
+    >
+      <button
+        type="button"
+        class="blog-timeline-label"
+        aria-label={`Scroll to ${items[0].title}`}
+      >
+        <small>{items[0].meta}</small>
+        <span>{items[0].title}</span>
+      </button>
+      <div class="blog-timeline-track">
+        <span class="blog-timeline-thumb" aria-hidden="true"></span>
+        {items.map((item, index) => {
+          const position =
+            items.length > 1 ? (index / (items.length - 1)) * 100 : 50;
+          return (
+            <button
+              type="button"
+              class="blog-timeline-dot"
+              style={`top: ${position}%`}
+              data-target={item.target}
+              data-meta={item.meta}
+              data-title={item.title}
+              data-level={item.level}
+              aria-label={`Scroll to ${item.title}`}
+            />
+          );
+        })}
+      </div>
+    </nav>
+  )
+}
+
+<script is:inline>
+  (function () {
+    var timeline = document.querySelector("[data-blog-timeline]");
+    if (!timeline) return;
+
+    var track = timeline.querySelector(".blog-timeline-track");
+    var label = timeline.querySelector(".blog-timeline-label");
+    var labelMeta = label && label.querySelector("small");
+    var labelTitle = label && label.querySelector("span");
+    var dots = Array.prototype.slice.call(
+      timeline.querySelectorAll(".blog-timeline-dot"),
+    );
+    if (!track || !label || !labelMeta || !labelTitle || dots.length === 0) return;
+
+    var activeIndex = 0;
+    var previewIndex = -1;
+    var dragging = false;
+    var ticking = false;
+    var reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    function targetFor(dot) {
+      return document.getElementById(dot.getAttribute("data-target") || "");
+    }
+
+    function maximumScroll() {
+      return Math.max(
+        0,
+        document.documentElement.scrollHeight - window.innerHeight,
+      );
+    }
+
+    function targetTop(dot) {
+      var target = targetFor(dot);
+      if (!target) return 0;
+      return Math.max(
+        0,
+        Math.min(
+          maximumScroll(),
+          target.getBoundingClientRect().top + window.scrollY - 96,
+        ),
+      );
+    }
+
+    function showLabel(index) {
+      var dot = dots[index];
+      if (!dot) return;
+      labelMeta.textContent = dot.getAttribute("data-meta") || "";
+      labelTitle.textContent = dot.getAttribute("data-title") || "";
+      label.setAttribute(
+        "aria-label",
+        "Scroll to " + (dot.getAttribute("data-title") || "section"),
+      );
+      timeline.style.setProperty("--label-position", dot.style.top);
+    }
+
+    function positionDots() {
+      var limit = maximumScroll();
+      dots.forEach(function (dot) {
+        var position = limit > 0 ? (targetTop(dot) / limit) * 100 : 50;
+        dot.style.top = position + "%";
+      });
+      showLabel(previewIndex >= 0 ? previewIndex : activeIndex);
+    }
+
+    function setActive(index) {
+      activeIndex = index;
+      dots.forEach(function (dot, dotIndex) {
+        var isActive = dotIndex === index;
+        dot.classList.toggle("is-active", isActive);
+        if (isActive) {
+          dot.setAttribute("aria-current", "location");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
+      });
+      if (previewIndex < 0 && !dragging) showLabel(index);
+    }
+
+    function update() {
+      var nextIndex = 0;
+      for (var i = dots.length - 1; i >= 0; i--) {
+        var target = targetFor(dots[i]);
+        if (target && target.getBoundingClientRect().top <= 160) {
+          nextIndex = i;
+          break;
+        }
+      }
+      setActive(nextIndex);
+      var limit = maximumScroll();
+      var position = limit > 0 ? (window.scrollY / limit) * 100 : 0;
+      timeline.style.setProperty("--scroll-position", position + "%");
+    }
+
+    function scrollToDot(index) {
+      window.scrollTo({
+        top: targetTop(dots[index]),
+        behavior: reducedMotion ? "auto" : "smooth",
+      });
+    }
+
+    function closestDot(ratio) {
+      var closestIndex = 0;
+      var closestDistance = Infinity;
+      dots.forEach(function (dot, index) {
+        var position = (parseFloat(dot.style.top) || 0) / 100;
+        var distance = Math.abs(position - ratio);
+        if (distance < closestDistance) {
+          closestIndex = index;
+          closestDistance = distance;
+        }
+      });
+      return closestIndex;
+    }
+
+    function scrub(clientY) {
+      var bounds = track.getBoundingClientRect();
+      var ratio = Math.max(
+        0,
+        Math.min(1, (clientY - bounds.top) / bounds.height),
+      );
+      dragging = true;
+      previewIndex = closestDot(ratio);
+      timeline.classList.add("is-interacting");
+      showLabel(previewIndex);
+      window.scrollTo({ top: ratio * maximumScroll(), behavior: "auto" });
+    }
+
+    dots.forEach(function (dot, index) {
+      dot.addEventListener("mouseenter", function () {
+        previewIndex = index;
+        timeline.classList.add("is-interacting");
+        showLabel(index);
+      });
+      dot.addEventListener("mouseleave", function () {
+        if (dragging) return;
+        previewIndex = -1;
+        timeline.classList.remove("is-interacting");
+        showLabel(activeIndex);
+      });
+      dot.addEventListener("focus", function () {
+        previewIndex = index;
+        timeline.classList.add("is-interacting");
+        showLabel(index);
+      });
+      dot.addEventListener("blur", function () {
+        previewIndex = -1;
+        timeline.classList.remove("is-interacting");
+        showLabel(activeIndex);
+      });
+      dot.addEventListener("click", function () {
+        scrollToDot(index);
+      });
+    });
+
+    label.addEventListener("click", function () {
+      scrollToDot(previewIndex >= 0 ? previewIndex : activeIndex);
+    });
+
+    track.addEventListener("pointerdown", function (event) {
+      if (event.target.closest(".blog-timeline-dot")) return;
+      event.preventDefault();
+      track.setPointerCapture(event.pointerId);
+      scrub(event.clientY);
+    });
+    track.addEventListener("pointermove", function (event) {
+      if (track.hasPointerCapture(event.pointerId)) scrub(event.clientY);
+    });
+    track.addEventListener("pointerup", function (event) {
+      if (track.hasPointerCapture(event.pointerId)) {
+        track.releasePointerCapture(event.pointerId);
+      }
+      dragging = false;
+      previewIndex = -1;
+      timeline.classList.remove("is-interacting");
+      update();
+    });
+    track.addEventListener("pointercancel", function () {
+      dragging = false;
+      previewIndex = -1;
+      timeline.classList.remove("is-interacting");
+      update();
+    });
+
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          update();
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+
+    window.addEventListener("resize", positionDots, { passive: true });
+    window.addEventListener("load", positionDots, { once: true });
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(positionDots).observe(document.body);
+    }
+
+    positionDots();
+    update();
+  })();
+</script>
