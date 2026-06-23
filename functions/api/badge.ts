@@ -62,8 +62,8 @@ export async function onRequest(ctx: {
     }
     if (!saved_usd && env.TELEMETRY_DB) {
       const row = await env.TELEMETRY_DB.prepare(
-        `SELECT COALESCE(SUM(saved_usd),0) AS saved_usd,
-                COALESCE(SUM(tokens_saved),0) AS tokens_saved,
+        `SELECT COALESCE(SUM(saved_usd + carry_usd),0) AS saved_usd,
+                COALESCE(SUM(tokens_saved + carry_tokens),0) AS tokens_saved,
                 COALESCE(SUM(calls_avoided),0) AS calls_avoided
          FROM telemetry_rollups`,
       ).first<{

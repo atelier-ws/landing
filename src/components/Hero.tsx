@@ -13,7 +13,7 @@ const EMPTY_PAUSE_MS = 400;
 type Phase = "typing" | "deleting";
 
 type PublicMetrics = {
-  gross_usd: number;
+  cost_usd: number;
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
@@ -22,7 +22,7 @@ type PublicMetrics = {
 };
 
 const MOCK_METRICS: PublicMetrics = {
-  gross_usd: 1243.5,
+  cost_usd: 1243.5,
   saved_usd: 784.2,
   tokens_saved: 340_000,
   calls_avoided: 553,
@@ -179,7 +179,7 @@ export default function Hero() {
           {metrics && (
             <div className="mt-8 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 border border-neutral-300 bg-white/70 px-3 py-2 text-[11px] text-neutral-500 sm:text-xs">
               <span className="font-bold text-orange-600">
-                {formatCompactUsd(metrics.gross_usd)} cost
+                {formatCompactUsd(metrics.cost_usd)} cost
               </span>
               <span className="text-neutral-300">|</span>
               <span className="font-bold text-emerald-600">
@@ -208,13 +208,13 @@ export default function Hero() {
 function normalizeMetrics(payload: unknown): PublicMetrics | null {
   if (!payload || typeof payload !== "object") return null;
   const candidate = payload as Record<string, unknown>;
-  const gross_usd = numberValue(candidate.gross_usd);
+  const cost_usd = numberValue(candidate.cost_usd);
   const saved_usd = numberValue(candidate.saved_usd);
   const tokens_saved = intValue(candidate.tokens_saved);
   const calls_avoided = intValue(candidate.calls_avoided);
   if (saved_usd <= 0 && tokens_saved <= 0 && calls_avoided <= 0) return null;
   return {
-    gross_usd,
+    cost_usd,
     saved_usd,
     tokens_saved,
     calls_avoided,

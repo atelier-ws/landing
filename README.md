@@ -56,9 +56,18 @@ Rollup payload shape:
   "saved_usd": 0.16,
   "tokens_saved": 9240,
   "calls_avoided": 3,
+  "carry_usd": 0.04,
+  "carry_tokens": 1200,
+  "turn_count": 5,
+  "est_cost_usd": 0.02,
   "occurred_at": "2026-06-16T10:00:00Z"
 }
 ```
+
+New fields since migration 0003/0007:
+- `carry_usd`, `carry_tokens`: savings carried over from retained context
+- `turn_count`: conversation turns in this session
+- `est_cost_usd`: estimated model-cost of the session (added in migration 0007)
 
 The Function hashes install/session identifiers before storage, dedupes by
 session, bounds metric values, and refreshes the public KV aggregate after each
@@ -85,6 +94,8 @@ npx wrangler d1 execute atelier-telemetry --remote \
   --file migrations/0005_remove_duplicate_license_issuer.sql
 npx wrangler d1 execute atelier-telemetry --remote \
   --file migrations/0006_license_checkout_delivery.sql
+npx wrangler d1 execute atelier-telemetry --remote \
+  --file migrations/0007_add_cost_usd.sql
 ```
 
 Enable Email Sending for the sender domain and keep the `EMAIL` binding in the

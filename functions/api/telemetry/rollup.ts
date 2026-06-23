@@ -38,11 +38,12 @@ type RollupPayload = {
   carry_usd?: unknown;
   carry_tokens?: unknown;
   turn_count?: unknown;
+  est_cost_usd?: unknown;
   occurred_at?: unknown;
 };
 
 type PublicMetrics = {
-  gross_usd: number;
+  cost_usd: number;
   saved_usd: number;
   tokens_saved: number;
   calls_avoided: number;
@@ -57,6 +58,7 @@ const MAX_BODY_BYTES = 4096;
 const MAX_SESSION_USD = 1_000;
 const MAX_SESSION_TOKENS = 100_000_000;
 const MAX_SESSION_CALLS = 1_000_000;
+const MAX_SESSION_COST_USD = 1_000_000;
 
 export async function onRequest(context: PagesContext): Promise<Response> {
   if (context.request.method === "OPTIONS") {
@@ -102,6 +104,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const callsAvoided = boundedInt(payload.calls_avoided, MAX_SESSION_CALLS);
   const carryUsd = boundedNumber(payload.carry_usd, MAX_SESSION_USD) ?? 0;
   const carryTokens = boundedInt(payload.carry_tokens, 1_000_000_000) ?? 0;
+  const costUsd = boundedNumber(payload.est_cost_usd, MAX_SESSION_COST_USD) ?? 0;
   const MAX_SESSION_TURNS = 10_000;
   const turnCount = boundedInt(payload.turn_count, MAX_SESSION_TURNS);
   if (savedUsd === null || tokensSaved === null || callsAvoided === null) {
@@ -116,6 +119,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     callsAvoided <= 0 &&
     carryUsd <= 0 &&
     carryTokens <= 0 &&
+    costUsd <= 0 &&
     turnCount <= 0
   ) {
     return json({ ok: true, stored: false }, 202, corsHeaders());
@@ -136,6 +140,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       occurred_at,
       received_at,
       -- carry columns added in migration 0003
+      -- cost_usd added in migration 0007
       atelier_version,
       source,
       saved_usd,
@@ -143,9 +148,10 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       calls_avoided,
       carry_usd,
       carry_tokens,
+      cost_usd,
       turns
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(session_key) DO UPDATE SET
       install_key = excluded.install_key,
       occurred_at = excluded.occurred_at,
@@ -157,6 +163,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       calls_avoided = max(telemetry_rollups.calls_avoided, excluded.calls_avoided),
       carry_usd = max(telemetry_rollups.carry_usd, excluded.carry_usd),
       carry_tokens = max(telemetry_rollups.carry_tokens, excluded.carry_tokens),
+      cost_usd = max(telemetry_rollups.cost_usd, excluded.cost_usd),
       turns = max(telemetry_rollups.turns, excluded.turns)
   `,
   )
@@ -172,6 +179,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       callsAvoided,
       roundMoney(carryUsd),
       carryTokens,
+      roundMoney(costUsd),
       turnCount,
     )
     .run();
@@ -189,8 +197,8 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .prepare(
       `
       SELECT
-        COALESCE(SUM(saved_usd + carry_usd), 0) AS gross_usd,
-        COALESCE(SUM(saved_usd), 0) AS saved_usd,
+        COALESCE(SUM(cost_usd), 0) AS cost_usd,
+        COALESCE(SUM(saved_usd + carry_usd), 0) AS saved_usd,
         COALESCE(SUM(tokens_saved + carry_tokens), 0) AS tokens_saved,
         COALESCE(SUM(calls_avoided), 0) AS calls_avoided,
         COALESCE(SUM(turns), 0) AS turns,
@@ -203,7 +211,7 @@ async function aggregateMetrics(db: D1Database): Promise<PublicMetrics> {
     .first<Record<string, unknown>>();
 
   return {
-    gross_usd: roundMoney(numberValue(row?.gross_usd)),
+    cost_usd: roundMoney(numberValue(row?.cost_usd)),
     saved_usd: roundMoney(numberValue(row?.saved_usd)),
     tokens_saved: intValue(row?.tokens_saved),
     calls_avoided: intValue(row?.calls_avoided),
