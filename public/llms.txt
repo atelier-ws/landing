@@ -1,6 +1,6 @@
 # Atelier
 
-> Source-available context runtime for coding agents: one MCP server and SDK middleware layer for code intelligence, context reuse, model routing, cost tracking, and auditable traces.
+> Source-available context runtime for coding agents: one MCP server and SDK middleware layer for code intelligence, model routing, cost tracking, and auditable traces.
 
 Atelier helps coding agents spend less effort rediscovering codebase structure. It provides supervised read/search/edit tools, SCIP-indexed code intelligence, reusable procedures, failure rescue, loop detection, routing, and run ledgers across agent hosts.
 
@@ -18,7 +18,7 @@ Atelier helps coding agents spend less effort rediscovering codebase structure. 
 - Category: source-available runtime engineering platform for AI agents.
 - Main audience: developers and teams using coding agents on real repositories.
 - Core runtime surfaces: CLI, MCP server, SDK middleware, optional local dashboard.
-- Core capabilities: code intelligence, context reuse, context compaction, model routing, cost tracking, prefix-cache diagnostics, failure rescue, loop detection, rubrics, and auditable traces.
+- Core capabilities: code intelligence, context compaction, model routing, cost tracking, prefix-cache diagnostics, failure rescue, loop detection, rubrics, and auditable traces.
 - Supported hosts include Claude Code, Codex, Copilot, Cursor, opencode, Hermes Agent, LangChain, OpenAI SDK, Gemini ADK, and MCP-compatible hosts.
 - Install command: `curl -fsSL https://install.atelier.ws | bash`.
 - License: FSL-1.1-ALv2.

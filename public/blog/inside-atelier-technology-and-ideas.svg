@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Inside Atelier: technology and design ideas</title>
+  <desc id="desc">A complete technical field guide to the Atelier coding-agent runtime.</desc>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#d8dbe4" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.72" />
+  <rect x="72" y="72" width="1056" height="486" fill="#ffffff" stroke="#d4d4d8" stroke-width="2" />
+  <text x="112" y="150" fill="#9b75d9" font-family="monospace" font-size="34" font-weight="700">&gt; ATELIER / FIELD GUIDE</text>
+  <text x="112" y="265" fill="#18181b" font-family="monospace" font-size="62" font-weight="700">TECHNOLOGY +</text>
+  <text x="112" y="340" fill="#18181b" font-family="monospace" font-size="62" font-weight="700">DESIGN IDEAS</text>
+  <text x="112" y="420" fill="#52525b" font-family="monospace" font-size="25">Tools, indexing, memory, routing, safety, storage.</text>
+  <rect x="112" y="486" width="370" height="44" fill="#18181b" />
+  <text x="134" y="516" fill="#f7f8fb" font-family="monospace" font-size="21">atelier.ws/blog</text>
+</svg>

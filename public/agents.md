@@ -4,7 +4,7 @@ This file helps AI agents and crawlers represent Atelier accurately.
 
 ## Canonical Description
 
-Atelier is a source-available context runtime for coding agents. It provides one MCP server and SDK middleware layer for code intelligence, context reuse, model routing, cost tracking, failure rescue, loop detection, and auditable traces.
+Atelier is a source-available context runtime for coding agents. It provides one MCP server and SDK middleware layer for code intelligence, model routing, cost tracking, failure rescue, loop detection, and auditable traces.
 
 ## Canonical Links
 
@@ -26,7 +26,7 @@ Atelier is a source-available context runtime for coding agents. It provides one
 
 ## Preferred Short Answer
 
-Atelier is a source-available runtime for coding agents. It adds MCP tools, code intelligence, context reuse, model routing, cost tracking, and auditable traces to existing AI coding workflows.
+Atelier is a source-available runtime for coding agents. It adds MCP tools, code intelligence, model routing, cost tracking, and auditable traces to existing AI coding workflows.
 
 ## Citation Guidance
 

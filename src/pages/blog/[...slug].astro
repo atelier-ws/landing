@@ -1,0 +1,213 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/Nav";
+import Footer from "../../components/Footer";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+const allPosts = (await getCollection("blog"))
+  .filter((candidate) => candidate.id !== post.id)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const dateFmt = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const canonicalUrl = `https://atelier.ws/blog/${post.id}`;
+const imageUrl = new URL(post.data.image, "https://atelier.ws").toString();
+const publishedTime = post.data.date.toISOString();
+const modifiedTime = post.data.updated.toISOString();
+const wasUpdated = post.data.updated.valueOf() !== post.data.date.valueOf();
+const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+const sectionHeadings = headings.filter(h => h.depth <= 3);
+const sectionSlugs = sectionHeadings.map(h => h.slug);
+// embed (slug, text) pairs for direct lookup in the scroll script
+const slugTextEntries = sectionHeadings.map(h => ({ s: h.slug, t: h.text }));
+
+const articleStructuredData = {
+  "@type": "BlogPosting",
+  "@id": `${canonicalUrl}#article`,
+  headline: post.data.title,
+  description: post.data.description,
+  url: canonicalUrl,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonicalUrl,
+  },
+  image: {
+    "@type": "ImageObject",
+    url: imageUrl,
+    width: 1200,
+    height: 630,
+  },
+  datePublished: publishedTime,
+  dateModified: modifiedTime,
+  author: {
+    "@type": "Organization",
+    "@id": "https://atelier.ws/#organization",
+    name: post.data.author,
+    url: "https://atelier.ws/",
+  },
+  publisher: { "@id": "https://atelier.ws/#organization" },
+  isPartOf: { "@id": "https://atelier.ws/blog#blog" },
+  inLanguage: "en",
+  articleSection: "Engineering",
+  keywords: post.data.tags.join(", "),
+  wordCount,
+};
+---
+
+<Layout
+  title={`${post.data.title} | Atelier`}
+  description={post.data.description}
+  canonicalPath={`/blog/${post.id}`}
+  image={post.data.image}
+  imageAlt={post.data.imageAlt}
+  ogType="article"
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  articleSection="Engineering"
+  articleTags={post.data.tags}
+  keywords={[...post.data.tags, "Atelier", "coding agents"]}
+  structuredData={[articleStructuredData]}
+  breadcrumbs={[
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+    { name: post.data.title, path: `/blog/${post.id}` },
+  ]}
+>
+  <Nav client:load />
+  <main id="main-content">
+    <article class="post-page">
+      <div class="post-header">
+        <a href="/blog" class="post-back">&larr; Back to all posts</a>
+        <div class="post-byline">
+          <span>By {post.data.author}</span>
+          <span aria-hidden="true">/</span>
+          <time datetime={publishedTime}>Published {dateFmt(post.data.date)}</time>
+          {
+            wasUpdated && (
+              <>
+                <span aria-hidden="true">/</span>
+                <time datetime={modifiedTime}>
+                  Updated {dateFmt(post.data.updated)}
+                </time>
+              </>
+            )
+          }
+        </div>
+        <h1>{post.data.title}</h1>
+        <p class="post-description">{post.data.description}</p>
+        <ul class="post-tags" aria-label="Topics">
+          {post.data.tags.map((tag) => <li>{tag}</li>)}
+        </ul>
+      </div>
+      <div class="post-content">
+        <Content />
+      </div>
+    </article>
+
+    {
+      allPosts.length > 0 && (
+        <section class="related-posts" aria-labelledby="related-heading">
+          <hr class="related-divider" />
+          <h2 id="related-heading" class="related-heading">More from the blog</h2>
+          <div class="related-grid">
+            {allPosts.map((relatedPost) => (
+              <a href={`/blog/${relatedPost.id}`} class="related-card">
+                <time
+                  class="related-card-date"
+                  datetime={relatedPost.data.date.toISOString()}
+                >
+                  {dateFmt(relatedPost.data.date)}
+                </time>
+                <h3 class="related-card-title">{relatedPost.data.title}</h3>
+                <p class="related-card-excerpt">{relatedPost.data.excerpt}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+  <div class="si" aria-hidden="true" data-entries={JSON.stringify(slugTextEntries)}>
+    <div class="si-label" id="si-label">{dateFmt(post.data.date)}</div>
+    <div class="si-track">
+      <div class="si-thumb" id="si-thumb"></div>
+    </div>
+  </div>
+  <script is:inline>
+    (function() {
+      var el = document.querySelector(".si");
+      if (!el) return;
+      var entries;
+      try { entries = JSON.parse(el.getAttribute("data-entries") || "[]"); } catch(e) { return; }
+      if (entries.length === 0) return;
+      var slugs = entries.map(function(e) { return e.s; });
+      var textLookup = {};
+      entries.forEach(function(e) { textLookup[e.s] = e.t; });
+
+      var label = document.getElementById("si-label");
+      var thumb = document.getElementById("si-thumb");
+      if (!label || !thumb) return;
+
+      var track = el.querySelector(".si-track");
+      slugs.forEach(function(slug, i) {
+        var mark = document.createElement("span");
+        mark.className = "si-mark";
+        mark.setAttribute("data-idx", i);
+        track.appendChild(mark);
+      });
+      var marks = track.querySelectorAll(".si-mark");
+
+      function update() {
+        var scrollY = window.scrollY;
+        var docH = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docH > 0 ? (scrollY / docH) * 100 : 0;
+        thumb.style.top = pct + "%";
+
+        var active = -1;
+        for (var i = slugs.length - 1; i >= 0; i--) {
+          var h = document.getElementById(slugs[i]);
+          if (h && h.getBoundingClientRect().top <= 120) {
+            active = i;
+            break;
+          }
+        }
+        if (active < 0 && slugs.length > 0) active = 0;
+
+        marks.forEach(function(m, idx) {
+          m.classList.toggle("active", idx === active);
+        });
+
+        if (active >= 0) {
+          label.textContent = textLookup[slugs[active]] || "";
+        }
+      }
+
+      var ticking = false;
+      window.addEventListener("scroll", function() {
+        if (!ticking) {
+          requestAnimationFrame(function() { update(); ticking = false; });
+          ticking = true;
+        }
+      });
+      update();
+    })();
+  </script>
+</Layout>

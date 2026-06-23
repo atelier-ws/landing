@@ -15,6 +15,12 @@ export default function Footer() {
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <a
+            href="/blog"
+            className="text-neutral-600 no-underline transition hover:text-neutral-950"
+          >
+            Blog
+          </a>
+          <a
             href="https://docs.atelier.ws/installation"
             className="text-neutral-600 no-underline transition hover:text-neutral-950"
           >

@@ -1,0 +1,220 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const dateFmt = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+// Render each post's full content for inline display, storing Content + headings separately
+const renderedPosts = await Promise.all(
+  posts.map(async (post) => {
+    const { Content, headings } = await render(post);
+    const sectionHeadings = headings.filter((h) => h.depth <= 3);
+    return {
+      post,
+      Content,
+      sectionHeadings,
+      sectionSlugs: sectionHeadings.map((h) => h.slug),
+    };
+  }),
+);
+
+// embed (slug, date) pairs so the scroll script can look up dates
+// without any DOM traversal (closest / querySelector / date parsing)
+const slugDateEntries = renderedPosts.flatMap((p) =>
+  p.sectionSlugs.map((slug) => ({
+    s: slug,
+    d: p.post.data.date.toISOString(),
+  })),
+);
+
+const blogStructuredData = {
+  "@type": "Blog",
+  "@id": "https://atelier.ws/blog#blog",
+  name: "Atelier Blog",
+  url: "https://atelier.ws/blog",
+  description:
+    "Engineering notes about Atelier, coding-agent runtimes, code intelligence, and context economics.",
+  inLanguage: "en",
+  publisher: { "@id": "https://atelier.ws/#organization" },
+  blogPost: posts.map((post) => ({
+    "@type": "BlogPosting",
+    "@id": `https://atelier.ws/blog/${post.id}#article`,
+    headline: post.data.title,
+    url: `https://atelier.ws/blog/${post.id}`,
+    datePublished: post.data.date.toISOString(),
+    dateModified: post.data.updated.toISOString(),
+    image: new URL(post.data.image, "https://atelier.ws").toString(),
+  })),
+};
+---
+
+<Layout
+  title="Atelier Blog: Coding-Agent Runtime Engineering"
+  description="Engineering notes on how Atelier works, coding-agent cost, code intelligence, context engineering, verification, and MCP runtime design."
+  canonicalPath="/blog"
+  breadcrumbs={[
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+  ]}
+  structuredData={[blogStructuredData]}
+  keywords={[
+    "Atelier blog",
+    "coding agent runtime",
+    "MCP server",
+    "code intelligence",
+    "context engineering",
+    "coding agent cost",
+  ]}
+>
+  <Nav client:load />
+  <main id="main-content">
+    <div class="blog-list">
+      <header class="blog-list-header">
+        <p class="blog-eyebrow">Engineering notes</p>
+        <h1>How coding-agent runtimes work</h1>
+      </header>
+
+      <div class="blog-articles">
+        {
+          renderedPosts.map((r) => {
+            const { Content } = r;
+            const { post } = r;
+            return (
+              <article class="blog-entry" data-reveal id={post.id}>
+                <div class="blog-entry-header">
+                  <div class="blog-entry-meta">
+                    <span>By {post.data.author}</span>
+                    <span aria-hidden="true">/</span>
+                    <time datetime={post.data.date.toISOString()}>
+                      Published {dateFmt(post.data.date)}
+                    </time>
+                    {post.data.updated.valueOf() !==
+                      post.data.date.valueOf() && (
+                      <>
+                        <span aria-hidden="true">/</span>
+                        <time datetime={post.data.updated.toISOString()}>
+                          Updated {dateFmt(post.data.updated)}
+                        </time>
+                      </>
+                    )}
+                  </div>
+                  <h2>{post.data.title}</h2>
+                  <p class="blog-entry-desc">{post.data.description}</p>
+                  <ul class="post-tags" aria-label="Topics">
+                    {post.data.tags.map((tag) => (
+                      <li>{tag}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="post-content">
+                  <Content />
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </main>
+  <Footer />
+  <div class="si" aria-hidden="true" data-entries={JSON.stringify(slugDateEntries)}>
+    <div class="si-label" id="si-label">
+      {renderedPosts.length > 0 ? dateFmt(renderedPosts[0].post.data.date) : ""}
+    </div>
+    <div class="si-track">
+      <div class="si-thumb" id="si-thumb"></div>
+    </div>
+  </div>
+  <script is:inline>
+    (function () {
+      var el = document.querySelector(".si");
+      if (!el) return;
+      var entries;
+      try {
+        entries = JSON.parse(el.getAttribute("data-entries") || "[]");
+      } catch (e) {
+        return;
+      }
+      if (entries.length === 0) return;
+      var slugs = entries.map(function (e) {
+        return e.s;
+      });
+      var dateLookup = {};
+      entries.forEach(function (e) {
+        dateLookup[e.s] = e.d;
+      });
+
+      var label = document.getElementById("si-label");
+      var thumb = document.getElementById("si-thumb");
+      if (!label || !thumb) return;
+
+      var track = el.querySelector(".si-track");
+      slugs.forEach(function (slug, i) {
+        var mark = document.createElement("span");
+        mark.className = "si-mark";
+        mark.setAttribute("data-idx", i);
+        track.appendChild(mark);
+      });
+
+      var marks = track.querySelectorAll(".si-mark");
+
+      function update() {
+        var scrollY = window.scrollY;
+        var docH = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docH > 0 ? (scrollY / docH) * 100 : 0;
+        thumb.style.top = pct + "%";
+
+        var active = -1;
+        for (var i = slugs.length - 1; i >= 0; i--) {
+          var h = document.getElementById(slugs[i]);
+          if (h && h.getBoundingClientRect().top <= 120) {
+            active = i;
+            break;
+          }
+        }
+        if (active < 0 && slugs.length > 0) active = 0;
+
+        marks.forEach(function (m, idx) {
+          m.classList.toggle("active", idx === active);
+        });
+
+        if (active >= 0) {
+          var dateStr = dateLookup[slugs[active]];
+          if (dateStr) {
+            var d = new Date(dateStr);
+            if (!isNaN(d)) {
+              label.textContent = d.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+            }
+          }
+        }
+      }
+
+      var ticking = false;
+      window.addEventListener("scroll", function () {
+        if (!ticking) {
+          requestAnimationFrame(function () {
+            update();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+      update();
+    })();
+  </script>
+</Layout>

@@ -11,7 +11,7 @@ Atelier is the source-available runtime engineering platform for AI agents. It i
 - MCP server for coding-agent hosts.
 - SDK middleware for AI agent runtimes.
 - SCIP-indexed code intelligence, including symbols, callers, callees, usages, and ranked search.
-- Context reuse, context compaction, source projection, outline reads, range reads, and token-budgeted search.
+- Context compaction, source projection, outline reads, range reads, and token-budgeted search.
 - Model routing, cost tracking, prefix-cache diagnostics, and per-session savings reports.
 - Failure rescue, loop detection, rubrics, run ledgers, and auditable traces.
 
