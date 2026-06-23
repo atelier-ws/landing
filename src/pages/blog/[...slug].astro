@@ -35,8 +35,9 @@ const wasUpdated = post.data.updated.valueOf() !== post.data.date.valueOf();
 const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
 const sectionHeadings = headings.filter(h => h.depth <= 3);
 const sectionSlugs = sectionHeadings.map(h => h.slug);
-// embed (slug, text) pairs for direct lookup in the scroll script
-const slugTextEntries = sectionHeadings.map(h => ({ s: h.slug, t: h.text }));
+const headingsBySlug = Object.fromEntries(
+  sectionHeadings.map(h => [h.slug, h.text]),
+);
 
 const articleStructuredData = {
   "@type": "BlogPosting",
@@ -145,7 +146,7 @@ const articleStructuredData = {
     }
   </main>
   <Footer />
-  <div class="si" aria-hidden="true" data-entries={JSON.stringify(slugTextEntries)}>
+  <div class="si" aria-hidden="true" data-slugs={JSON.stringify(sectionSlugs)} data-headings={JSON.stringify(headingsBySlug)}>
     <div class="si-label" id="si-label">{dateFmt(post.data.date)}</div>
     <div class="si-track">
       <div class="si-thumb" id="si-thumb"></div>
@@ -155,12 +156,12 @@ const articleStructuredData = {
     (function() {
       var el = document.querySelector(".si");
       if (!el) return;
-      var entries;
-      try { entries = JSON.parse(el.getAttribute("data-entries") || "[]"); } catch(e) { return; }
-      if (entries.length === 0) return;
-      var slugs = entries.map(function(e) { return e.s; });
-      var textLookup = {};
-      entries.forEach(function(e) { textLookup[e.s] = e.t; });
+      var slugs, textLookup;
+      try {
+        slugs = JSON.parse(el.getAttribute("data-slugs") || "[]");
+        textLookup = JSON.parse(el.getAttribute("data-headings") || "{}");
+      } catch(e) { return; }
+      if (slugs.length === 0) return;
 
       var label = document.getElementById("si-label");
       var thumb = document.getElementById("si-thumb");

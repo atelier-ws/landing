@@ -37,6 +37,10 @@ const slugDateEntries = renderedPosts.flatMap((p) =>
     d: p.post.data.date.toISOString(),
   })),
 );
+const allSlugs = renderedPosts.flatMap((p) => p.sectionSlugs);
+const datesBySlug = Object.fromEntries(
+  slugDateEntries.map((e) => [e.s, e.d]),
+);
 
 const blogStructuredData = {
   "@type": "Blog",
@@ -128,7 +132,7 @@ const blogStructuredData = {
     </div>
   </main>
   <Footer />
-  <div class="si" aria-hidden="true" data-entries={JSON.stringify(slugDateEntries)}>
+  <div class="si" aria-hidden="true" data-slugs={JSON.stringify(allSlugs)} data-dates={JSON.stringify(datesBySlug)}>
     <div class="si-label" id="si-label">
       {renderedPosts.length > 0 ? dateFmt(renderedPosts[0].post.data.date) : ""}
     </div>
@@ -140,20 +144,14 @@ const blogStructuredData = {
     (function () {
       var el = document.querySelector(".si");
       if (!el) return;
-      var entries;
+      var slugs, dateLookup;
       try {
-        entries = JSON.parse(el.getAttribute("data-entries") || "[]");
+        slugs = JSON.parse(el.getAttribute("data-slugs") || "[]");
+        dateLookup = JSON.parse(el.getAttribute("data-dates") || "{}");
       } catch (e) {
         return;
       }
-      if (entries.length === 0) return;
-      var slugs = entries.map(function (e) {
-        return e.s;
-      });
-      var dateLookup = {};
-      entries.forEach(function (e) {
-        dateLookup[e.s] = e.d;
-      });
+      if (slugs.length === 0) return;
 
       var label = document.getElementById("si-label");
       var thumb = document.getElementById("si-thumb");
