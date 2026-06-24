@@ -137,21 +137,21 @@ export async function handleLicenseRecovery(
         .bind(emailHash, now)
         .run();
 
-      ctx.waitUntil(
-        sendLicenseEmail(env, email, licenses.results, "recovery").catch(
-          (error: unknown) => {
-            console.error(
-              JSON.stringify({
-                message: "license_recovery_email_failed",
-                error: errorMessage(error),
-              }),
-            );
-          },
-        ),
-      );
+      try {
+        await sendLicenseEmail(env, email, licenses.results, "recovery");
+        return json({ sent: true }, 200);
+      } catch (error: unknown) {
+        console.error(
+          JSON.stringify({
+            message: "license_recovery_email_failed",
+            error: errorMessage(error),
+          }),
+        );
+        return json({ sent: false, error: "The email could not be delivered. Try again shortly or contact support." }, 502);
+      }
     }
 
-    // Deliberately identical for known and unknown addresses.
+    // No matching license — don't reveal whether the address exists.
     return json({ accepted: true }, 202);
   } catch (error) {
     console.error(
