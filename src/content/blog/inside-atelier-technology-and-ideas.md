@@ -8,6 +8,19 @@ excerpt: "An inventory of Atelier's public tools, internal capabilities, technol
 image: "/blog/inside-atelier-technology-and-ideas.png"
 imageAlt: "Diagram-style title card reading Technology and Design Ideas"
 tags: ["Architecture", "Technology", "MCP"]
+category: "Architecture"
+difficulty: "Advanced"
+summary: >-
+  Atelier is a host-neutral MCP runtime whose layers cover repository search,
+  parsing and graphs, projected source reading, deterministic editing,
+  supervised execution, context budgeting, five forms of memory, durable
+  workflows, model routing, verification, governance, and cost accounting. The
+  implementation combines Python, Pydantic, SQLite, Tree-sitter, SCIP, Zoekt,
+  ast-grep, FastAPI, and optional vector or observability backends behind a much
+  smaller public tool surface. Across those subsystems, the same rules recur:
+  disclose detail progressively, keep compression reversible, ground mutations
+  in evidence, fail closed when proof is required, and optimize every result
+  for the agent’s next decision.
 ---
 
 Atelier is easy to describe badly.
@@ -26,25 +39,16 @@ This inventory was checked against Atelier 0.4.25 on June 23, 2026.
 
 ## Contents
 
-- [The system in one diagram](#the-system-in-one-diagram)
-- [The foundation](#the-foundation)
-- [Public MCP tools](#the-public-mcp-tool-surface)
-- [Hidden and administrative tools](#hidden-and-administrative-mcp-tools)
-- [Code intelligence](#code-intelligence-how-atelier-understands-a-repository)
-- [Progressive source reading](#progressive-source-reading)
-- [Editing and code transformation](#editing-and-code-transformation)
-- [Shell, SQL, and web execution](#shell-sql-and-web-execution)
-- [Context engineering](#context-engineering)
-- [Memory systems](#memory-is-five-different-systems)
-- [Agents, roles, and workflows](#agents-roles-and-workflows)
-- [Verification, safety, and governance](#verification-safety-and-governance)
-- [Cost accounting and optimization](#cost-accounting-and-optimization)
-- [Storage and process architecture](#storage-and-process-architecture)
-- [Host integration](#host-integration)
-- [Internal capability inventory](#the-long-tail-of-internal-capabilities)
-- [Design principles](#the-ideas-that-connect-everything)
+- [Runtime foundation](#runtime-foundation): system map, technology stack, and MCP tools
+- [Repository operations](#repository-operations): code intelligence, reading, editing, and execution
+- [Context and orchestration](#context-and-orchestration): context, memory, agents, and workflows
+- [Reliability and deployment](#reliability-and-deployment): verification, cost, storage, and hosts
+- [Design principles](#the-ideas-that-connect-everything): the ideas that connect the system
+- [Implementation sources](#primary-implementation-sources)
 
-## The system in one diagram
+## Runtime foundation
+
+### The system in one diagram
 
 ```text
 Claude Code / Codex / OpenCode / another host
@@ -67,7 +71,7 @@ symbols/graphs     verify/web fetch      reuse/compaction
 
 The coding model still plans and reasons. The host still owns the conversation, permissions, and user interface. Atelier owns the working surface between the model and the repository.
 
-## The foundation
+### The foundation
 
 The core runtime is Python 3.12+ and is packaged with Hatch. Production wheels can compile the `src/atelier` package with mypyc, while development uses ordinary Python.
 
@@ -96,7 +100,7 @@ The main technology choices are:
 
 There are optional integrations for Ollama, OpenAI embeddings, Letta, OpenMemory, LiteLLM, Langfuse, OR-Tools, Rope, PostgreSQL, and pgvector. The default local path does not require all of them.
 
-## The public MCP tool surface
+### The public MCP tool surface
 
 Atelier registers more capabilities than it advertises. The default language-model surface contains ten tools.
 
@@ -119,7 +123,7 @@ Tool definitions come from typed Python functions. Atelier inspects each functio
 
 The boundary also repairs common client mistakes: a whole argument object sent as a JSON string, integers and booleans serialized as strings, a single glob sent where an array was declared, or an old parameter name retained by a client. Repair is conservative and validation still happens before the handler runs.
 
-## Hidden and administrative MCP tools
+### Hidden and administrative MCP tools
 
 The following tools are registered and callable by internal code, tests, the CLI, or power users, but are not advertised to the model by default.
 
@@ -142,11 +146,13 @@ The following tools are registered and callable by internal code, tests, the CLI
 
 A user can hide additional public tools with configuration. This is not only cosmetic: every removed schema reduces fixed prompt material and model tool-choice deliberation.
 
-## Code intelligence: how Atelier understands a repository
+## Repository operations
+
+### Code intelligence: how Atelier understands a repository
 
 Atelier does not depend on one universal parser or one universal search algorithm. It combines several sources of evidence and falls back when a richer source is unavailable.
 
-### Language registry
+#### Language registry
 
 The canonical language table recognizes:
 
@@ -175,7 +181,7 @@ The canonical language table recognizes:
 
 The registry also records available SCIP indexers. Examples include `scip-python`, `scip-typescript`, `scip-go`, `scip-java`, `scip-ruby`, `scip-clang`, and Rust Analyzer.
 
-### Parsing and symbol extraction
+#### Parsing and symbol extraction
 
 Atelier uses several parsing paths:
 
@@ -189,7 +195,7 @@ Atelier uses several parsing paths:
 
 SCIP artifacts can be generated by Atelier, discovered from external tools, read from cache, and watched for changes. The index has lineage metadata so cached data can be tied to the repository and embedder state that produced it.
 
-### Text search
+#### Text search
 
 The search stack includes:
 
@@ -206,7 +212,7 @@ The search stack includes:
 
 Code semantic search is off by default unless a code embedder is configured. Available backends are local embeddings, OpenAI, Letta, Ollama, or a null backend. Ollama availability is checked at call time and falls back locally when unavailable.
 
-### Ranking and packing
+#### Ranking and packing
 
 Finding candidates is only half the problem. Atelier also has to decide which candidates deserve context.
 
@@ -216,7 +222,7 @@ Results are deduplicated, grouped, and fitted to a caller-specified token budget
 
 Search also carries an explicit verdict. A result can be found, missed, absent, or degraded because a search channel is unavailable. Reformulation history distinguishes "the first query missed" from "we have enough evidence that this symbol is absent." A soft breaker discourages repeated unproductive searches.
 
-### Graph analysis
+#### Graph analysis
 
 The code graph supports:
 
@@ -239,41 +245,41 @@ The code graph supports:
 
 Heuristic results are labeled as heuristics rather than presented as compiler truth.
 
-## Progressive source reading
+### Progressive source reading
 
 Atelier treats source text as a hierarchy of views.
 
-### Outline
+#### Outline
 
 Large code files default to a structural outline rather than a complete body. The outline contains imports, classes, functions, methods, and line numbers.
 
-### Range
+#### Range
 
 An exact line range returns only the requested source. Redundant language and projection metadata is removed from ranged responses.
 
-### Full
+#### Full
 
 Small files can be returned in full. `expand=true` requests an exact full read, subject to transport safety limits.
 
-### Compact and minified projections
+#### Compact and minified projections
 
 For supported languages, a projected view can remove comments, repeated blank lines, and other low-value detail. Atelier reparses minified output to ensure the transform remains structurally valid.
 
 A projection includes a mapping between projected coordinates and original coordinates. An edit can therefore refer to the smaller view while still applying to the real file. If the mapping is ambiguous, Atelier can recommend the exact source range to reread.
 
-### Large-file continuation
+#### Large-file continuation
 
 Moderately large files return a line-aligned prefix plus the exact continuation range. Extremely large files are bounded before they are fully materialized in memory.
 
-### Batch reads
+#### Batch reads
 
 Independent files can be read in one request. Savings and errors are tracked per file rather than letting one failed batch item invalidate the whole response.
 
-### Missing-path correction
+#### Missing-path correction
 
 When a file path is wrong, Atelier searches for nearby basename matches and reports candidates. If no such file exists under the workspace, it says so explicitly to prevent the model from retrying the same dead path.
 
-## Editing and code transformation
+### Editing and code transformation
 
 The `edit` tool accepts several distinct descriptor families:
 
@@ -306,9 +312,9 @@ The edit pipeline includes:
 
 The separate `codemod` tool uses ast-grep patterns. It matches syntax rather than text, supports metavariables such as `$X` and `$$$`, previews a unified diff by default, and only writes when `dry_run=false`.
 
-## Shell, SQL, and web execution
+### Shell, SQL, and web execution
 
-### Shell supervision
+#### Shell supervision
 
 The shell surface supports synchronous commands and managed background processes. Background calls return a session handle that can be polled or cancelled.
 
@@ -324,49 +330,51 @@ The wrapper:
 
 Long-running shell, workflow, agent, edit-verification, and web calls use a separate worker pool so they cannot starve cheap reads and searches.
 
-### SQL supervision
+#### SQL supervision
 
 The SQL tool can discover connections, list tables, inspect schemas and relationships, search schema names, lint SQL, and run bounded queries. It automatically limits result size, enforces timeouts, and keeps writes disabled unless the caller explicitly opts in. Batches report avoided calls.
 
-### Web retrieval
+#### Web retrieval
 
 The web fetcher accepts public HTTP and HTTPS URLs, blocks local and private targets, applies response and time bounds, caches results briefly, prefers Markdown when available, and can turn HTML into clean Markdown using extraction and conversion libraries.
 
-## Context engineering
+## Context and orchestration
+
+### Context engineering
 
 Context engineering is the part of Atelier that decides what the model should see now, what can wait, and what must survive later.
 
-### Bootstrap context
+#### Bootstrap context
 
 A cold repository can enqueue background work that builds initial repository knowledge. Later calls reuse the bootstrap blocks rather than recomputing them.
 
-### Scoped context
+#### Scoped context
 
 Given a subtask, affected paths, keywords, exclusions, and a token budget, the scoped-context capability assembles the smallest useful context pack. It can combine code search, prior procedures, and known dead ends.
 
-### Prompt budgeting
+#### Prompt budgeting
 
 The prompt budget optimizer selects context blocks under a token budget. It can use OR-Tools CP-SAT when installed and has a greedy fallback.
 
-### Prompt compilation
+#### Prompt compilation
 
 The prompt compiler classifies blocks by kind and stability, assembles cache-safe prompts, enforces budgets, and lints ordering. Stable, branch-level, session-level, and turn-level material can be arranged to protect provider prefix caches.
 
-### Prefix-cache planning
+#### Prefix-cache planning
 
 Atelier tracks stable-prefix hashes, cache-read tokens, invalidation reasons, input splits, and cache hit ratios. It can recommend cache-stable ordering and keep owned sub-agent spawns in a shared cache scope.
 
-### Result deduplication
+#### Result deduplication
 
 Byte-identical `read`, `search`, `grep`, and `explore` results can be replaced with a small session pointer. File reads can return a delta for a previously seen resource. Compaction advances the deduplication epoch so old pointers do not survive into a context that no longer contains their targets.
 
-### Reversible output spilling
+#### Reversible output spilling
 
 Large shell, SQL, web, and extreme file results are written to a spill store. The model receives a bounded head-and-tail summary and a reference. It can retrieve the full output or a slice later.
 
 The order matters: Atelier stores the original before any lossy compaction. If the spill fails, it does not pretend the missing detail is recoverable.
 
-### Session compaction and handover
+#### Session compaction and handover
 
 The run ledger tracks token use and events. The current policy:
 
@@ -378,33 +386,33 @@ Automatic compaction also considers turn count and structured task boundaries. A
 
 Compaction preserves recent turns, active errors, recently touched files, pinned memories, active playbooks, and repository instruction hashes. A handover packet lets a fresh agent continue without carrying the entire transcript.
 
-## Memory is five different systems
+### Memory is five different systems
 
 Atelier uses the word "memory" for several related but distinct jobs.
 
-### Named fact memory
+#### Named fact memory
 
 The public memory service stores user-created facts as named blocks. Facts can be recalled and voted up or down. Storage can be SQLite, Letta, or OpenMemory.
 
-### Archival recall
+#### Archival recall
 
 Session transcript passages and code chunks are archived, embedded, and ranked. Recall combines BM25 and cosine similarity.
 
-### Memory arbitration
+#### Memory arbitration
 
 Before a fact write, an optional local arbiter compares similar memories and chooses ADD, UPDATE, DELETE, or NOOP. It fails open to ADD if the arbiter is unavailable.
 
-### Cross-vendor memory
+#### Cross-vendor memory
 
 Read-only adapters ingest native memory files from Claude, Codex, and Gemini into a unified fact representation. They do not mutate the other tool's files.
 
-### Semantic file memory
+#### Semantic file memory
 
 Despite the name, this is code structure rather than conversational memory. It caches AST-derived file outlines, symbols, imports, and summaries for smart reads and code intelligence.
 
 Related capabilities include symbol recall, session recall, staleness checks, knowledge extraction, playbook retrieval, dead-end tracking, procedure clustering, and sleep-time consolidation of recent traces.
 
-## Agents, roles, and workflows
+### Agents, roles, and workflows
 
 Atelier packages role definitions separately from the host that runs them.
 
@@ -426,7 +434,7 @@ The registry stores host-neutral tool policies. Host renderers translate those p
 
 The packaged skills add benchmark runs, orchestration, performance review, durable recall, settings, multi-worktree swarms, and browser-based UX review.
 
-### Durable workflows
+#### Durable workflows
 
 The default execute-review workflow contains explicit phases:
 
@@ -438,7 +446,7 @@ Each step has a role, effort level, read-mode hint, and fork relationship. Execu
 
 Workflow state is persisted. A run can be inspected, paused, resumed, or stopped. Spawn receipts record model, provider, cache scope, reuse eligibility, and honored or dropped routing fields.
 
-### Owned execution and model routing
+#### Owned execution and model routing
 
 Atelier can run a sub-agent through configured provider APIs or installed host CLIs. Routing considers:
 
@@ -458,7 +466,9 @@ The route produces a receipt rather than silently pretending a requested model o
 
 Cross-vendor routing, quality-aware routing, tier routing, and owned execution are separate layers. This lets the runtime recommend a model, enforce a configured route, or leave the host's current model untouched.
 
-## Verification, safety, and governance
+## Reliability and deployment
+
+### Verification, safety, and governance
 
 Atelier uses different failure policies for different classes of feature.
 
@@ -466,13 +476,13 @@ Optional analytics generally fail open: if PR-risk enrichment or cache diagnosti
 
 Mutation and security boundaries are stricter.
 
-### Verification
+#### Verification
 
 The verifier runs deterministic lint, typecheck, and test commands over touched files. Failures become structured counterexamples that a later turn can consume. Retry budgets prevent endless repair loops.
 
 Rubric gates, proof gates, and quality-router verifiers add higher-level checks. The live reviewer is opt-in and non-blocking. Review roles are explicitly prevented from editing.
 
-### Trajectory monitoring
+#### Trajectory monitoring
 
 Six monitors look for:
 
@@ -487,13 +497,13 @@ A difficulty finite-state machine combines those signals and controls when addit
 
 The dispatcher also detects identical repeated tool calls and can append a soft no-progress note.
 
-### Security scanning
+#### Security scanning
 
 The hidden `scan` tool includes a small, high-signal ast-grep rule pack for patterns such as dangerous `eval`/`exec`, interpolated `shell=True`, SQL string construction, and hardcoded secrets. A bounded Python taint pass follows request, argument, environment, and input sources to selected execution and SQL sinks.
 
 The scanner labels severity, confidence, rule ID, CWE, source, and whether a result is heuristic. It explicitly does not claim to be a complete SAST engine.
 
-### Governance and audit
+#### Governance and audit
 
 Governance policies define redaction and retention. Audit bundles can be exported and verified. Telemetry paths scrub sensitive arguments. Workspace and request paths are normalized and confined before mutation.
 
@@ -501,31 +511,31 @@ Team capabilities add roles, invites, shared-memory permissions, signed workspac
 
 Licensing adds device registration, entitlement checks, local license state, and cryptographic verification.
 
-## Cost accounting and optimization
+### Cost accounting and optimization
 
 Atelier tracks cost at several levels.
 
-### Tool token ledger
+#### Tool token ledger
 
 Input and final emitted output are tokenized per tool. Accounting happens after compaction and spilling, so it measures the payload the host received rather than the hidden original.
 
-### Conservative savings credit
+#### Conservative savings credit
 
 [Read savings are credited against a full-file baseline](/blog/how-atelier-saves-money) once per file and context epoch. Errors receive no credit. Code-intelligence credit is deferred through an observation window and cancelled if the supposedly avoided files are later read.
 
-### Session analytics
+#### Session analytics
 
 SQLite analytics store session, token, cache, and cost history. JSONL sidecars provide live savings updates and status-line summaries without injecting those analytics into the model's prompt.
 
-### Pricing
+#### Pricing
 
 Pricing tables distinguish input, output, cache reads, and cache writes by model. Unknown models are not assigned invented prices.
 
-### Counterfactual and benchmark evidence
+#### Counterfactual and benchmark evidence
 
 Counterfactual modules estimate alternative routing and pricing outcomes. Benchmark manifests, gates, and evidence records keep experimental results tied to exact configurations and artifacts.
 
-### Optimization advisor
+#### Optimization advisor
 
 The optimizer works at three levels:
 
@@ -535,11 +545,11 @@ The optimizer works at three levels:
 
 It can compare routing and compaction candidates, run non-inferiority checks, maintain optimization history, and prepare policy or pull-request proposals. It does not silently change policy just because a heuristic predicts lower cost.
 
-### Reporting
+#### Reporting
 
 Savings summaries, session reports, dashboards, leadership-facing weekly reports, and audit exports all consume the same underlying traces and ledgers.
 
-## Storage and process architecture
+### Storage and process architecture
 
 Atelier is local-first.
 
@@ -560,7 +570,7 @@ Concurrency controls include:
 
 The stdio server keeps initialization synchronous, then dispatches ordinary requests concurrently. The HTTP adapter exposes discovery plus request/response and SSE-compatible behavior with body limits and redacted errors.
 
-## Host integration
+### Host integration
 
 Atelier's runtime detects and adapts to multiple coding hosts. The code contains host paths or projections for Claude Code, Codex, OpenCode, Antigravity, Cursor, Hermes, GitHub Copilot, and LangGraph-style integrations. The default MCP templates currently include Claude, Codex, and Antigravity.
 
@@ -580,7 +590,7 @@ Host integration includes:
 
 The CLI covers project initialization, updates, host setup, MCP serving, tools, context, memory, recall, playbooks, routes, sessions, savings, benchmarks, swarms, telemetry, database inspection, licensing, services, and administrative operations.
 
-## The long tail of internal capabilities
+### The long tail of internal capabilities
 
 Some subsystems do not need a public tool of their own but are still part of Atelier's architecture.
 

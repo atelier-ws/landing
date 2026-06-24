@@ -8,6 +8,18 @@ excerpt: "Atelier saves money by changing what enters the model's context: fewer
 image: "/blog/how-atelier-saves-money.png"
 imageAlt: "Diagram-style title card reading How Atelier Saves Money"
 tags: ["Cost", "Context engineering", "Coding agents"]
+category: "Economics"
+difficulty: "Intermediate"
+summary: >-
+  Most coding-agent tokens are spent before the final patch: locating files,
+  reopening source, repeating searches, carrying logs, and preserving an
+  overgrown conversation. Atelier attacks each source of waste with ranked
+  discovery, projected and batched reads, strict output budgets, recoverable
+  log spilling, duplicate-content pointers, and boundary-aware compaction.
+  Savings are credited conservatively—failed reads earn nothing, baselines are
+  not counted twice, and deferred code-intelligence credit is cancelled when
+  supposedly avoided files are later opened. The meaningful comparison keeps
+  the model, task, and repository constant and measures the verified outcome.
 ---
 
 A coding agent does not spend most of its time writing the final patch.

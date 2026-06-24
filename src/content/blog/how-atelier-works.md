@@ -8,6 +8,16 @@ excerpt: "Atelier is an MCP runtime between your coding agent and your repositor
 image: "/blog/how-atelier-works.png"
 imageAlt: "Diagram-style title card reading How Atelier Works"
 tags: ["MCP", "Code intelligence", "Coding agents"]
+category: "Fundamentals"
+difficulty: "Introductory"
+summary: >-
+  Atelier sits between a coding agent and its repository as an MCP runtime. Its
+  small public tool surface lets the agent search before reading, inspect a
+  projected outline before requesting full source, apply structured edits, and
+  run supervised shell or data operations. Heavy work is isolated from cheap
+  requests, while session ledgers separate temporary working context from facts
+  that should survive the conversation. The result is not a smarter model, but
+  a more precise and recoverable path from a question to a verified change.
 ---
 
 Atelier is not another coding model. It does not replace Claude Code, Codex, or the agent you already use.

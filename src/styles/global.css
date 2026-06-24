@@ -400,8 +400,12 @@ a:hover {
 }
 
 :is(.post-content, .blog-card-content) h2 {
+  position: relative;
+  scroll-margin-top: 6.5rem;
   margin-top: 2.25rem;
   margin-bottom: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ece9ef;
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.1rem;
   font-weight: 700;
@@ -409,12 +413,74 @@ a:hover {
 }
 
 :is(.post-content, .blog-card-content) h3 {
+  position: relative;
+  scroll-margin-top: 6.5rem;
   margin-top: 1.75rem;
   margin-bottom: 0.4rem;
   font-family: 'JetBrains Mono', monospace;
   font-size: 1rem;
   font-weight: 600;
   color: #0a0a0a;
+}
+
+:is(.post-content, .blog-card-content) h4 {
+  position: relative;
+  scroll-margin-top: 6.5rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: #38323e;
+}
+
+.post-heading-anchor {
+  margin-left: 0.45rem;
+  color: #9b7ac7 !important;
+  font-size: 0.78em;
+  font-weight: 500;
+  text-decoration: none !important;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+:is(.post-content, .blog-card-content) :is(h2, h3, h4):hover .post-heading-anchor,
+.post-heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.post-toc-heading {
+  margin-bottom: 0 !important;
+  border-bottom: 0;
+}
+
+.post-toc {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0 !important;
+  padding: 1rem !important;
+  border: 1px solid #ece7f2;
+  border-radius: 0 0 12px 12px;
+  background: #faf8fc;
+  list-style: none;
+}
+
+.post-toc li {
+  margin: 0 !important;
+}
+
+.post-toc a {
+  display: block;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-decoration: none !important;
+}
+
+.post-toc a:hover {
+  background: #f0e9f8;
 }
 
 :is(.post-content, .blog-card-content) p {
@@ -472,15 +538,52 @@ a:hover {
   font-size: inherit;
 }
 
-:is(.post-content, .blog-card-content) table {
+.post-callout {
+  position: relative;
+  margin: 1.4rem 0;
+  padding: 1rem 1.1rem 1rem 1.25rem;
+  border: 1px solid rgba(106, 57, 179, 0.17);
+  border-left: 3px solid #6a39b3;
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(135deg, #faf7fd, #fff);
+  color: #4c4553;
+}
+
+.post-callout > :first-child {
+  margin-top: 0 !important;
+}
+
+.post-callout > :last-child {
+  margin-bottom: 0 !important;
+}
+
+.post-table-wrap {
   width: 100%;
   margin: 1.25rem 0;
+  overflow-x: auto;
+  border: 1px solid #e6e2e9;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0.45rem 1.25rem rgba(35, 24, 46, 0.04);
+  scrollbar-width: thin;
+}
+
+.post-table-wrap:focus-visible {
+  outline: 2px solid #6a39b3;
+  outline-offset: 2px;
+}
+
+:is(.post-content, .blog-card-content) table {
+  width: 100%;
+  min-width: 32rem;
+  margin: 0;
   border-collapse: collapse;
   font-size: 0.78rem;
 }
 :is(.post-content, .blog-card-content) thead tr {
-  border-bottom: 2px solid #d4d4d4;
-  color: #737373;
+  border-bottom: 1px solid #d8d2df;
+  background: #f6f2f9;
+  color: #5f5666;
   text-align: left;
 }
 :is(.post-content, .blog-card-content) th,
@@ -491,12 +594,21 @@ a:hover {
 :is(.post-content, .blog-card-content) tbody tr {
   border-bottom: 1px solid #ececec;
 }
-:is(.post-content, .blog-card-content) tbody tr:last-child td {
-  border-top: 2px solid #d4d4d4;
-  background: #faf8fe;
+:is(.post-content, .blog-card-content) tbody tr:nth-child(even) {
+  background: #fcfbfd;
+}
+:is(.post-content, .blog-card-content) tbody tr:hover {
+  background: #f8f4fb;
 }
 :is(.post-content, .blog-card-content) tbody td:first-child {
   color: #0a0a0a;
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .post-toc {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Hero stat band */
@@ -590,6 +702,65 @@ a:hover {
   font-size: 1rem;
   line-height: 1.65;
   color: #737373;
+}
+
+.post-learning {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  padding: 1.15rem 1.3rem;
+  border: 1px solid rgba(106, 57, 179, 0.2);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(159, 112, 218, 0.16), transparent 42%),
+    linear-gradient(145deg, #fcfaff, #f7f2fc);
+  box-shadow: 0 0.7rem 2rem rgba(67, 40, 92, 0.07);
+}
+
+.post-learning::after {
+  position: absolute;
+  top: -2rem;
+  right: -1.25rem;
+  width: 5rem;
+  height: 5rem;
+  border: 1px solid rgba(106, 57, 179, 0.12);
+  border-radius: 50%;
+  content: "";
+}
+
+.post-learning h2 {
+  margin: 0 0 0.65rem;
+  color: #6a39b3;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.post-learning h2 span {
+  display: inline-grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-right: 0.35rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #6a39b3;
+  color: #fff;
+  font-size: 0.68rem;
+}
+
+.post-learning h2 svg {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.post-learning p {
+  margin: 0;
+  color: #57525d;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .post-hero-image {
@@ -703,6 +874,43 @@ a:hover {
   line-height: 1.65;
   color: #737373;
   margin: 0.5rem 0 0;
+}
+
+.post-references {
+  margin-top: 2.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e7e2eb;
+  border-radius: 12px;
+  background: #faf9fb;
+}
+
+.post-references summary {
+  color: #57515e;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.post-references summary::-webkit-details-marker {
+  display: none;
+}
+
+.post-references summary::before {
+  display: inline-block;
+  margin-right: 0.55rem;
+  color: #6a39b3;
+  content: "+";
+  transition: transform 150ms ease;
+}
+
+.post-references[open] summary::before {
+  content: "−";
+}
+
+.post-references > :not(summary):first-of-type {
+  margin-top: 1rem;
 }
 
 /* ---------------------------------------------------------------------------
@@ -991,6 +1199,14 @@ html:has(.blog-timeline) body::-webkit-scrollbar {
   font-weight: 700;
   color: #0a0a0a;
   line-height: 1.3;
+}
+
+.related-card-meta {
+  margin-top: 0.3rem;
+  color: #6a39b3;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
 }
 
 .related-card-excerpt {

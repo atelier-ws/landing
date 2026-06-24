@@ -1,0 +1,32 @@
+---
+interface Props {
+  id: string;
+  summary: string;
+}
+
+const { id, summary } = Astro.props;
+---
+
+{
+  summary && (
+    <aside class="post-learning" aria-labelledby={id}>
+      <h2 id={id}>
+        <span aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path
+              d="M12 3l1.15 3.85a5.5 5.5 0 0 0 3.7 3.7L21 12l-4.15 1.45a5.5 5.5 0 0 0-3.7 3.7L12 21l-1.15-3.85a5.5 5.5 0 0 0-3.7-3.7L3 12l4.15-1.45a5.5 5.5 0 0 0 3.7-3.7L12 3Z"
+            ></path>
+            <path d="M19 3v4M21 5h-4"></path>
+          </svg>
+        </span>
+        Article summary
+      </h2>
+      <p>{summary}</p>
+    </aside>
+  )
+}

@@ -4,6 +4,8 @@ import Layout from "../../layouts/Layout.astro";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
 import BlogTimeline from "../../components/BlogTimeline.astro";
+import BlogContentEnhancer from "../../components/BlogContentEnhancer.astro";
+import ArticleSummary from "../../components/ArticleSummary.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -34,6 +36,7 @@ const publishedTime = post.data.date.toISOString();
 const modifiedTime = post.data.updated.toISOString();
 const wasUpdated = post.data.updated.valueOf() !== post.data.date.valueOf();
 const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 220));
 const sectionHeadings = headings;
 const timelineItems = [
   {
@@ -80,6 +83,7 @@ const articleStructuredData = {
   articleSection: "Engineering",
   keywords: post.data.tags.join(", "),
   wordCount,
+  timeRequired: `PT${readingTime}M`,
 };
 ---
 
@@ -111,6 +115,10 @@ const articleStructuredData = {
           <span>By {post.data.author}</span>
           <span aria-hidden="true">/</span>
           <time datetime={publishedTime}>Published {dateFmt(post.data.date)}</time>
+          <span aria-hidden="true">/</span>
+          <span>{readingTime} min read</span>
+          <span aria-hidden="true">/</span>
+          <span>{post.data.difficulty}</span>
           {
             wasUpdated && (
               <>
@@ -124,6 +132,7 @@ const articleStructuredData = {
         </div>
         <h1>{post.data.title}</h1>
         <p class="post-description">{post.data.description}</p>
+        <ArticleSummary id="post-learning-heading" summary={post.data.summary} />
         <ul class="post-tags" aria-label="Topics">
           {post.data.tags.map((tag) => <li>{tag}</li>)}
         </ul>
@@ -148,6 +157,9 @@ const articleStructuredData = {
                   {dateFmt(relatedPost.data.date)}
                 </time>
                 <h3 class="related-card-title">{relatedPost.data.title}</h3>
+                <p class="related-card-meta">
+                  {relatedPost.data.category} · {relatedPost.data.difficulty}
+                </p>
                 <p class="related-card-excerpt">{relatedPost.data.excerpt}</p>
               </a>
             ))}
@@ -157,6 +169,7 @@ const articleStructuredData = {
     }
   </main>
   <Footer />
+  <BlogContentEnhancer />
   <BlogTimeline
     items={timelineItems}
     ariaLabel="Jump to a section of this article"

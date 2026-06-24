@@ -8,6 +8,17 @@ excerpt: "Memory is the most overloaded word in agent tooling. Atelier uses it f
 image: "/blog/five-kinds-of-memory-in-atelier.png"
 imageAlt: "Diagram-style title card reading Five Kinds of Memory"
 tags: ["Memory", "Code intelligence", "Coding agents"]
+category: "Context & Memory"
+difficulty: "Intermediate"
+summary: >-
+  Atelier separates memory into five systems instead of hiding them behind one
+  generic store. Named memory holds curated facts; archival recall searches
+  prior sessions and code; an arbiter decides whether a new fact should be
+  added, updated, deleted, or ignored; cross-vendor adapters read knowledge from
+  other coding tools; and semantic file memory caches parsed code structure.
+  These systems deliberately use different triggers, storage models, and
+  failure behavior. Keeping them separate makes it clear what the agent knows,
+  where that knowledge came from, and what happens when a backend is missing.
 ---
 
 "Memory" is one of the most overloaded words in agent tooling. It can mean a vector store, a scratchpad, a fine-tune, a config file, or a chat history, and a product that promises "memory" rarely says which one it means. Atelier uses the word for five genuinely different systems, and conflating them is how teams end up with a feature nobody can reason about.

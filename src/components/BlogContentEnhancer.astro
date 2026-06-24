@@ -1,0 +1,78 @@
+<script is:inline>
+  (function () {
+    var collapsibleHeadings = [
+      "sources and further reading",
+      "primary implementation sources",
+      "evidence and methodology",
+    ];
+
+    document.querySelectorAll(".post-content").forEach(function (content) {
+      Array.prototype.slice
+        .call(content.children)
+        .filter(function (child) {
+          return (
+            child.tagName === "H2" &&
+            collapsibleHeadings.indexOf(
+              (child.textContent || "").trim().toLowerCase(),
+            ) >= 0
+          );
+        })
+        .forEach(function (heading) {
+          var details = document.createElement("details");
+          details.className = "post-references";
+
+          var summary = document.createElement("summary");
+          summary.id = heading.id;
+          summary.textContent = heading.textContent || "References";
+
+          var next = heading.nextSibling;
+          heading.parentNode.insertBefore(details, heading);
+          details.appendChild(summary);
+          heading.remove();
+
+          while (next) {
+            var following = next.nextSibling;
+            if (next.nodeType === 1 && next.tagName === "H2") break;
+            details.appendChild(next);
+            next = following;
+          }
+        });
+
+      content.querySelectorAll("table").forEach(function (table) {
+        if (table.parentElement.classList.contains("post-table-wrap")) return;
+        var wrapper = document.createElement("div");
+        wrapper.className = "post-table-wrap";
+        wrapper.setAttribute("role", "region");
+        wrapper.setAttribute("aria-label", "Scrollable data table");
+        wrapper.tabIndex = 0;
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      });
+
+      content.querySelectorAll("blockquote").forEach(function (quote) {
+        quote.classList.add("post-callout");
+      });
+
+      content.querySelectorAll("h2").forEach(function (heading) {
+        if ((heading.textContent || "").trim().toLowerCase() !== "contents") return;
+        heading.classList.add("post-toc-heading");
+        var list = heading.nextElementSibling;
+        if (list && (list.tagName === "UL" || list.tagName === "OL")) {
+          list.classList.add("post-toc");
+        }
+      });
+
+      content.querySelectorAll("h2[id], h3[id], h4[id]").forEach(function (heading) {
+        var anchor = document.createElement("a");
+        anchor.className = "post-heading-anchor";
+        anchor.href = "#" + heading.id;
+        anchor.setAttribute(
+          "aria-label",
+          "Link to " + (heading.textContent || "this section"),
+        );
+        anchor.textContent = "#";
+        heading.appendChild(anchor);
+      });
+    });
+  })();
+</script>

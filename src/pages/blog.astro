@@ -3,6 +3,8 @@ import { getCollection, render } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import BlogContentEnhancer from "../components/BlogContentEnhancer.astro";
+import ArticleSummary from "../components/ArticleSummary.astro";
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -14,6 +16,9 @@ const dateFmt = (date: Date) =>
     month: "long",
     day: "numeric",
   });
+
+const readingMinutes = (body: string | undefined) =>
+  Math.max(1, Math.ceil((body ?? "").trim().split(/\s+/).filter(Boolean).length / 220));
 
 // Render each post's full content for inline display.
 const renderedPosts = await Promise.all(
@@ -84,6 +89,10 @@ const blogStructuredData = {
                     <time datetime={post.data.date.toISOString()}>
                       Published {dateFmt(post.data.date)}
                     </time>
+                    <span aria-hidden="true">/</span>
+                    <span>{readingMinutes(post.body)} min read</span>
+                    <span aria-hidden="true">/</span>
+                    <span>{post.data.difficulty}</span>
                     {post.data.updated.valueOf() !==
                       post.data.date.valueOf() && (
                       <>
@@ -98,6 +107,10 @@ const blogStructuredData = {
                     <a href={`/blog/${post.id}`}>{post.data.title}</a>
                   </h2>
                   <p class="blog-entry-desc">{post.data.description}</p>
+                  <ArticleSummary
+                    id={`article-summary-${post.id}`}
+                    summary={post.data.summary}
+                  />
                   <ul class="post-tags" aria-label="Topics">
                     {post.data.tags.map((tag) => (
                       <li>{tag}</li>
@@ -115,6 +128,7 @@ const blogStructuredData = {
     </div>
   </main>
   <Footer />
+  <BlogContentEnhancer />
   {
     renderedPosts.length > 0 && (
       <nav

@@ -8,6 +8,17 @@ excerpt: "A coding agent is only as good as the context it carries. Atelier trea
 image: "/blog/context-engineering-in-atelier.png"
 imageAlt: "Diagram-style title card reading Context Engineering"
 tags: ["Context engineering", "Code intelligence", "Coding agents"]
+category: "Context & Memory"
+difficulty: "Intermediate"
+summary: >-
+  A coding agent can reason only about what survives in its current
+  conversation, so Atelier treats context as a finite engineering budget. It
+  first shows compact source projections, caps every tool result, replaces
+  duplicate content with references, and selects the most useful blocks under
+  an explicit token ceiling. Stable material is ordered to protect provider
+  caches, while large outputs are spilled without losing their source. When a
+  session becomes crowded, compaction happens at a real task boundary and keeps
+  active errors, touched files, decisions, and other evidence needed to resume.
 ---
 
 A language model does not see your repository. It sees a conversation: a sequence of messages, tool results, and instructions that has to fit inside a finite context window. Whatever made it into that window is the entire world the agent can reason about on a given turn.
