@@ -1,5 +1,5 @@
 const CHECKOUT_CLAIM_TTL_SECONDS = 48 * 60 * 60;
-const RECOVERY_COOLDOWN_SECONDS = 10 * 60;
+const MANAGE_TOKEN_TTL_SECONDS = 10 * 60;
 
 export type LicenseEnv = Env & {
   STRIPE_SECRET_KEY?: string;
@@ -16,6 +16,8 @@ type CheckoutIdentity = {
   email: string;
   createdAt: number;
 };
+
+// ── Existing: checkout claim ──────────────────────────────────────────────────
 
 export async function handleCheckoutClaim(
   request: Request,
@@ -41,7 +43,7 @@ export async function handleCheckoutClaim(
     const license = await findCheckoutLicense(env.LICENSE_DB, checkout);
     if (!license) return json({ status: "pending" }, 202);
 
-    if (env.TELEMETRY_DB && env.EMAIL) {
+    if (env.TELEMETRY_DB && env.SENDPULSE_API_SECRET) {
       const delivered = await env.TELEMETRY_DB.prepare(
         "SELECT session_id FROM license_checkout_deliveries WHERE session_id = ?",
       )
@@ -88,13 +90,15 @@ export async function handleCheckoutClaim(
   }
 }
 
+// ── Existing: license recovery (request by email) ─────────────────────────────
+
 export async function handleLicenseRecovery(
   request: Request,
   env: LicenseEnv,
   ctx: ExecutionContext,
 ): Promise<Response> {
   if (request.method !== "POST") return methodNotAllowed("POST");
-  if (!env.TELEMETRY_DB || !env.LICENSE_DB || !env.EMAIL) {
+  if (!env.TELEMETRY_DB || !env.LICENSE_DB) {
     return json({ error: "license_service_unavailable" }, 503);
   }
 
@@ -118,15 +122,7 @@ export async function handleLicenseRecovery(
       .all<StoredLicense>();
 
     if (licenses.results.length > 0) {
-      const previous = await env.TELEMETRY_DB.prepare(
-        "SELECT last_sent_at FROM license_recovery_requests WHERE email_hash = ?",
-      )
-        .bind(emailHash)
-        .first<{ last_sent_at: number }>();
-      if (previous && now - previous.last_sent_at < RECOVERY_COOLDOWN_SECONDS) {
-        return json({ accepted: true }, 202);
-      }
-
+      // Track request count (no cooldown — user can request a new token freely).
       await env.TELEMETRY_DB.prepare(
         `INSERT INTO license_recovery_requests (email_hash, last_sent_at, request_count)
          VALUES (?, ?, 1)
@@ -163,6 +159,212 @@ export async function handleLicenseRecovery(
     return json({ accepted: true }, 202);
   }
 }
+
+// ── Manage page — fetch licenses by manage token ──────────────────────────────
+
+export async function handleLicenseManage(
+  request: Request,
+  env: LicenseEnv,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") ?? "";
+  if (!token) return json({ error: "missing_token" }, 400);
+
+  const row = await env.TELEMETRY_DB?.prepare(
+    `SELECT email, expires_at, created_at FROM license_manage_tokens
+      WHERE token = ? AND used = 0 AND expires_at > ?`,
+  )
+    .bind(token, unixNow())
+    .first<{ email: string; expires_at: number; created_at: number }>();
+  if (!row || !row.email) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const email = normalizeEmail(row.email);
+  if (!email) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const licenses = await env.LICENSE_DB.prepare(
+    `SELECT token, plan, expires_at
+       FROM licenses
+      WHERE lower(email) = ?
+        AND revoked = 0
+        AND (expires_at IS NULL OR expires_at >= ?)
+      ORDER BY updated_at DESC
+      LIMIT 10`,
+  )
+    .bind(email, unixNow())
+    .all<StoredLicense>();
+
+  return json({
+    licenses: licenses.results,
+    token,
+    expires_at: row.expires_at,
+    max_expires_at: row.created_at + MAX_SESSION_SECONDS,
+  });
+}
+
+const MAX_SESSION_SECONDS = 3600; // 1 hr hard cap from creation
+
+// ── Renew a manage token (extend expiry while page is active) ─────────────────
+
+export async function handleManageRenew(
+  request: Request,
+  env: LicenseEnv,
+): Promise<Response> {
+  if (request.method !== "POST") return methodNotAllowed("POST");
+
+  const body = record(await readJson(request));
+  const token = text(body?.manage_token, 512);
+  if (!token) return json({ error: "missing_token" }, 400);
+
+  const now = unixNow();
+  const row = await env.TELEMETRY_DB?.prepare(
+    `SELECT email, created_at FROM license_manage_tokens
+      WHERE token = ? AND used = 0 AND expires_at > ?`,
+  )
+    .bind(token, now)
+    .first<{ email: string; created_at: number }>();
+
+  if (!row) return json({ error: "invalid_or_expired_token" }, 401);
+
+  // Hard cap: never extend past created_at + MAX_SESSION_SECONDS
+  const maxExpiry = row.created_at + MAX_SESSION_SECONDS;
+  const newExpiry = Math.min(now + MANAGE_TOKEN_TTL_SECONDS, maxExpiry);
+  await env.TELEMETRY_DB?.prepare(
+    `UPDATE license_manage_tokens SET expires_at = ? WHERE token = ?`,
+  )
+    .bind(newExpiry, token)
+    .run();
+
+  return json({ ok: true, expires_at: newExpiry, max_expires_at: maxExpiry });
+}
+
+// ── Revoke a license key (authenticated by manage token) ──────────────────────
+
+export async function handleManageRevokeKey(
+  request: Request,
+  env: LicenseEnv,
+): Promise<Response> {
+  if (request.method !== "POST") return methodNotAllowed("POST");
+
+  const body = record(await readJson(request));
+  const token = text(body?.manage_token, 512);
+  const licenseToken = text(body?.license_token, 8192);
+  if (!token || !licenseToken) return json({ error: "missing_fields" }, 400);
+
+  // Validate manage token and get the associated email
+  const row = await env.TELEMETRY_DB?.prepare(
+    `SELECT email FROM license_manage_tokens
+      WHERE token = ? AND used = 0 AND expires_at > ?`,
+  )
+    .bind(token, unixNow())
+    .first<{ email: string }>();
+
+  if (!row) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const email = normalizeEmail(row.email);
+  if (!email) return json({ error: "invalid_or_expired_token" }, 401);
+
+  // Revoke only if the license key belongs to this user's email
+  const result = await env.LICENSE_DB.prepare(
+    `UPDATE licenses SET revoked = 1, revoked_at = ?
+      WHERE token = ? AND lower(email) = ? AND revoked = 0`,
+  )
+    .bind(unixNow(), licenseToken, email)
+    .run();
+
+  if (result.meta.changes === 0) {
+    return json({ error: "license_not_found" }, 404);
+  }
+
+  return json({ ok: true });
+}
+
+// ── List devices (authenticated by manage token) ─────────────────────────────
+
+type ManageDevice = {
+  device_id: string;
+  name: string;
+  created_at: number;
+  last_seen_at: number;
+};
+
+export async function handleManageListDevices(
+  request: Request,
+  env: LicenseEnv,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") ?? "";
+  if (!token) return json({ error: "missing_token" }, 400);
+
+  const row = await env.TELEMETRY_DB?.prepare(
+    `SELECT email FROM license_manage_tokens
+      WHERE token = ? AND used = 0 AND expires_at > ?`,
+  )
+    .bind(token, unixNow())
+    .first<{ email: string }>();
+
+  if (!row) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const email = normalizeEmail(row.email);
+  if (!email) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const devices = await env.LICENSE_DB.prepare(
+    `SELECT d.device_id, d.name, d.created_at, d.last_seen_at
+       FROM devices d
+       JOIN licenses l ON d.license_id = l.license_id
+      WHERE lower(l.email) = ?
+        AND d.revoked_at IS NULL
+      ORDER BY d.last_seen_at DESC`,
+  )
+    .bind(email)
+    .all<ManageDevice>();
+
+  return json({ devices: devices.results });
+}
+
+// ── Remove a device (authenticated by manage token) ──────────────────────────
+
+export async function handleManageRemoveDevice(
+  request: Request,
+  env: LicenseEnv,
+): Promise<Response> {
+  if (request.method !== "POST") return methodNotAllowed("POST");
+
+  const body = record(await readJson(request));
+  const token = text(body?.manage_token, 512);
+  const deviceId = text(body?.device_id, 512);
+  if (!token || !deviceId) return json({ error: "missing_fields" }, 400);
+
+  const row = await env.TELEMETRY_DB?.prepare(
+    `SELECT email FROM license_manage_tokens
+      WHERE token = ? AND used = 0 AND expires_at > ?`,
+  )
+    .bind(token, unixNow())
+    .first<{ email: string }>();
+
+  if (!row) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const email = normalizeEmail(row.email);
+  if (!email) return json({ error: "invalid_or_expired_token" }, 401);
+
+  const result = await env.LICENSE_DB.prepare(
+    `UPDATE devices SET revoked_at = ?
+      WHERE device_id = ?
+        AND revoked_at IS NULL
+        AND license_id IN (
+          SELECT license_id FROM licenses WHERE lower(email) = ?
+        )`,
+  )
+    .bind(unixNow(), deviceId, email)
+    .run();
+
+  if (result.meta.changes === 0) {
+    return json({ error: "device_not_found" }, 404);
+  }
+
+  return json({ ok: true });
+}
+
+// ── Internal helpers ─────────────────────────────────────────────────────────
 
 async function fetchCheckoutIdentity(
   sessionId: string,
@@ -210,44 +412,133 @@ async function findCheckoutLicense(
     .first<StoredLicense>();
 }
 
+// ── Email sending ─────────────────────────────────────────────────────────────
+
+const SENDPULSE_API_BASE = "https://api.sendpulse.com";
+
+const SENDER_BY_PLAN: Record<string, string> = {
+  free: "free@atelier.ws",
+  pro: "licenses@atelier.ws",
+  enterprise: "licenses@atelier.ws",
+};
+
+function utf8ToBase64(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += 8192) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
+  }
+  return btoa(binary);
+}
+
+async function getAccessToken(
+  apiId: string,
+  apiSecret: string,
+): Promise<string> {
+  const res = await fetch(`${SENDPULSE_API_BASE}/oauth/access_token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      grant_type: "client_credentials",
+      client_id: apiId,
+      client_secret: apiSecret,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`SendPulse auth failed: ${res.status} ${await res.text()}`);
+  }
+  const data = (await res.json()) as { access_token: string };
+  return data.access_token;
+}
+
+function emailHtmlTemplate(opts: {
+  heading: string;
+  message: string;
+  manageUrl: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+<table align="center" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;margin:0 auto">
+  <tr><td style="padding:32px 24px 16px;text-align:center">
+    <span style="font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7b46cb">Atelier Pro</span>
+  </td></tr>
+  <tr><td style="padding:0 24px">
+    <table cellpadding="0" cellspacing="0" style="width:100%;background:#fff;border:1px solid #e5e5e5;border-radius:8px">
+      <tr><td style="padding:32px">
+        <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#171717">${escapeHtml(opts.heading)}</h1>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#525252">${escapeHtml(opts.message)}</p>
+        <table cellpadding="0" cellspacing="0" style="margin:24px 0 0;width:100%">
+            <tr><td style="background:#7b46cb;border-radius:6px;text-align:center">
+            <a href="${escapeHtml(opts.manageUrl)}" style="display:block;padding:12px 24px;font-size:13px;font-weight:600;color:#fff;text-decoration:none">Manage your licenses →</a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:24px;text-align:center;font-size:12px;color:#a3a3a3">
+    <p style="margin:0">Questions? <a href="mailto:contact@atelier.ws" style="color:#7b46cb;text-decoration:none">contact@atelier.ws</a></p>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
 async function sendLicenseEmail(
   env: LicenseEnv,
   to: string,
   licenses: StoredLicense[],
   reason: "purchase" | "recovery",
 ): Promise<void> {
+  const site = env.SITE_URL ?? "https://atelier.ws";
+  const manageUrl = `${site}/license/manage`;
+
   const heading =
     reason === "recovery"
-      ? "Your recovered Atelier Pro license"
+      ? "Your Atelier Pro license"
       : "Your Atelier Pro license";
-  const rows = licenses
-    .map(({ token, expires_at }) => {
-      const expiry =
-        expires_at === null
-          ? "Lifetime"
-          : new Date(expires_at * 1000).toISOString().slice(0, 10);
-      return `${token}\n\nActivate with:\natelier license activate ${token}\n\nValid through: ${expiry}`;
-    })
-    .join("\n\n---\n\n");
-  const htmlRows = licenses
-    .map(({ token, expires_at }) => {
-      const expiry =
-        expires_at === null
-          ? "Lifetime"
-          : new Date(expires_at * 1000).toISOString().slice(0, 10);
-      const command = `atelier license activate ${token}`;
-      return `<p>License key:</p><pre style="white-space:pre-wrap;word-break:break-all;background:#111827;color:#f9fafb;padding:16px">${escapeHtml(token)}</pre><p>Activate with:</p><pre style="white-space:pre-wrap;word-break:break-all;background:#111827;color:#f9fafb;padding:16px">${escapeHtml(command)}</pre><p>Valid through: ${expiry}</p>`;
-    })
-    .join("");
 
-  await env.EMAIL.send({
-    to,
-    from: { email: env.LICENSE_FROM_EMAIL, name: "Atelier" },
-    replyTo: "contact@atelier.ws",
-    subject: heading,
-    text: `${heading}\n\n${rows}\n\nAfter activation, the key is stored at ~/.atelier/license.key.\n\nSupport: contact@atelier.ws`,
-    html: `<h1>${heading}</h1>${htmlRows}<p>After activation, the key is stored at <code>~/.atelier/license.key</code>.</p><p>Support: <a href="mailto:contact@atelier.ws">contact@atelier.ws</a></p>`,
+  const message =
+    reason === "recovery"
+      ? "We received your license recovery request. Sign in to view your license keys and manage your devices."
+      : "Thank you for purchasing Atelier Pro. Sign in to view your license key and manage your devices.";
+
+  const text = `${heading}\n\n${message}\n\nManage your licenses: ${manageUrl}\n\nSupport: contact@atelier.ws`;
+
+  const html = emailHtmlTemplate({
+    heading,
+    message,
+    manageUrl,
   });
+
+  const token = await getAccessToken(env.SENDPULSE_API_ID, env.SENDPULSE_API_SECRET);
+
+  const response = await fetch(`${SENDPULSE_API_BASE}/smtp/emails`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: {
+        html: utf8ToBase64(html),
+        text,
+        subject: heading,
+        from: {
+          name: "Atelier",
+          email: SENDER_BY_PLAN[licenses[0].plan] ?? "licenses@atelier.ws",
+        },
+        to: [{ name: "", email: to }],
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `SendPulse rejected the email (${response.status}): ${await response.text()}`,
+    );
+  }
 }
 
 async function readBoundedText(request: Request, maxBytes: number): Promise<string> {
@@ -289,6 +580,16 @@ function stringValue(value: unknown): string | null {
 
 function objectId(value: unknown): string | null {
   return stringValue(value) ?? stringValue(record(value)?.id);
+}
+
+async function readJson(request: Request): Promise<unknown> {
+  return request.json();
+}
+
+function text(value: unknown, maxLength: number): string | null {
+  return typeof value === "string" && value.length > 0 && value.length <= maxLength
+    ? value
+    : null;
 }
 
 function positiveInt(value: unknown): number | null {

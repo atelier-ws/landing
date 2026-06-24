@@ -10,7 +10,12 @@ import { onRequest as handleBadge } from "../functions/api/badge";
 import { onRequest as handleStatsSvg } from "../functions/api/stats.svg";
 import {
   handleCheckoutClaim,
+  handleLicenseManage,
   handleLicenseRecovery,
+  handleManageListDevices,
+  handleManageRemoveDevice,
+  handleManageRenew,
+  handleManageRevokeKey,
   type LicenseEnv,
 } from "../functions/api/license";
 
@@ -46,6 +51,29 @@ export default {
     }
     if (url.pathname === "/api/license/recover") {
       return handleLicenseRecovery(request, env, ctx);
+    }
+    if (url.pathname === "/api/license/manage") {
+      return handleLicenseManage(request, env);
+    }
+    if (url.pathname === "/api/license/manage/revoke-key") {
+      return handleManageRevokeKey(request, env);
+    }
+    if (url.pathname === "/api/license/manage/renew") {
+      return handleManageRenew(request, env);
+    }
+    if (url.pathname === "/api/license/manage/devices") {
+      return handleManageListDevices(request, env);
+    }
+    if (url.pathname === "/api/license/manage/devices/remove") {
+      return handleManageRemoveDevice(request, env);
+    }
+
+    // Redirect old separate devices page to unified manage page.
+    if (url.pathname === "/license/devices" || url.pathname === "/license/devices/") {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "/license/manage" },
+      });
     }
 
     // Pro purchase -> the selected Stripe Payment Link. Enterprise -> contact.

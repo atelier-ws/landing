@@ -1,0 +1,22 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/Nav";
+import Footer from "../../components/Footer";
+import LicenseManager from "../../components/LicenseManager";
+---
+
+<Layout
+  title="Manage your Atelier Pro licenses & devices"
+  description="View and manage your Atelier Pro license keys and active devices."
+  canonicalPath="/license/manage"
+  robots="noindex,nofollow,noarchive"
+>
+  <meta slot="head" name="referrer" content="no-referrer" />
+  <Nav client:load />
+  <main id="main-content" class="px-6 pb-24 pt-32">
+    <div class="mx-auto max-w-2xl">
+      <LicenseManager client:load />
+    </div>
+  </main>
+  <Footer />
+</Layout>

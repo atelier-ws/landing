@@ -4,8 +4,9 @@ interface __BaseEnv_Env {
 	METRICS_CACHE: KVNamespace;
 	TELEMETRY_DB: D1Database;
 	LICENSE_DB: D1Database;
-	EMAIL: SendEmail;
 	ASSETS: Fetcher;
+	SENDPULSE_API_ID: string;
+	SENDPULSE_API_SECRET: string;
 	PRO_MONTHLY_CHECKOUT_URL: "https://buy.stripe.com/test_fZu00bfXU4iufWJ5zWe7m00";
 	PRO_YEARLY_CHECKOUT_URL: "https://buy.stripe.com/test_eVq7sD9zwaGS5i58M8e7m01";
 	LICENSE_FROM_EMAIL: "licenses@atelier.ws";
