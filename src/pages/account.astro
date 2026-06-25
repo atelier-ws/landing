@@ -1,0 +1,22 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+import AccountView from "../components/AccountView";
+---
+
+<Layout
+  title="Sign in — Atelier Pro account"
+  description="View and manage your Atelier Pro licenses and devices."
+  canonicalPath="/account"
+  robots="noindex,nofollow,noarchive"
+>
+  <meta slot="head" name="referrer" content="no-referrer" />
+  <Nav client:load />
+  <main id="main-content" class="px-6 pb-24 pt-32">
+    <div class="mx-auto max-w-2xl">
+      <AccountView client:load />
+    </div>
+  </main>
+  <Footer />
+</Layout>
