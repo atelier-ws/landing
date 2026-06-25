@@ -45,6 +45,12 @@ export default function LicenseRecovery() {
           If the email address is associated with an active license, you will
           receive it shortly.
         </p>
+        <a
+          href="/pricing"
+          className="mt-6 inline-flex bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-brand-700"
+        >
+          Get a new license
+        </a>
       </div>
     );
   }
@@ -87,6 +93,13 @@ export default function LicenseRecovery() {
           <p className="mt-1 text-sm text-red-800">{result.message}</p>
         </div>
       )}
+
+      <a
+        href="/pricing"
+        className="mt-6 inline-flex bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-brand-700"
+      >
+        Get a new license
+      </a>
     </div>
   );
 }

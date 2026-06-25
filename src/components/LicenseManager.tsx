@@ -44,6 +44,10 @@ export default function LicenseManager() {
   const [error, setError] = useState<string | null>(null);
   const [sessionExpiresAt, setSessionExpiresAt] = useState<number | null>(null);
   const [sessionExpiring, setSessionExpiring] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState<string | null>(null);
+  const [sendLinkState, setSendLinkState] = useState<
+    "idle" | "sending" | "sent"
+  >("idle");
   const activeRef = useRef(false);
   const renewTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -81,13 +85,17 @@ export default function LicenseManager() {
           fetch(`/api/license/manage?token=${encodeURIComponent(token)}`, {
             headers: { Accept: "application/json" },
           }),
-          fetch(`/api/license/manage/devices?token=${encodeURIComponent(token)}`, {
-            headers: { Accept: "application/json" },
-          }),
+          fetch(
+            `/api/license/manage/devices?token=${encodeURIComponent(token)}`,
+            {
+              headers: { Accept: "application/json" },
+            },
+          ),
         ]);
         if (!licRes.ok) throw new Error("invalid");
         const licData = (await licRes.json()) as {
           licenses: License[];
+          email?: string;
           token: string;
           expires_at: number;
           max_expires_at: number;
@@ -101,6 +109,7 @@ export default function LicenseManager() {
           setDevices(devData.devices);
         }
 
+        setRecoveryEmail(licData.email ?? null);
         setView("manage");
       } catch {
         setView("link_invalid");
@@ -119,7 +128,10 @@ export default function LicenseManager() {
       try {
         const response = await fetch("/api/license/manage/renew", {
           method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
           body: JSON.stringify({ manage_token: manageToken }),
         });
         if (!response.ok) throw new Error("renew_failed");
@@ -158,6 +170,24 @@ export default function LicenseManager() {
   }, [sessionExpiresAt]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
+  const sendNewLink = async () => {
+    if (!recoveryEmail || sendLinkState !== "idle") return;
+    setSendLinkState("sending");
+    try {
+      await fetch("/api/license/recover", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ email: recoveryEmail }),
+      });
+      setSendLinkState("sent");
+    } catch {
+      setSendLinkState("idle");
+    }
+  };
+
   const revokeKey = async (licenseToken: string) => {
     if (!manageToken) return;
     if (
@@ -174,8 +204,14 @@ export default function LicenseManager() {
     try {
       const response = await fetch("/api/license/manage/revoke-key", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ manage_token: manageToken, license_token: licenseToken }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          manage_token: manageToken,
+          license_token: licenseToken,
+        }),
       });
       if (!response.ok) throw new Error("failed");
       setLicenses((prev) => prev.filter((l) => l.token !== licenseToken));
@@ -203,11 +239,19 @@ export default function LicenseManager() {
     try {
       const response = await fetch("/api/license/manage/devices/remove", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ manage_token: manageToken, device_id: device.device_id }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          manage_token: manageToken,
+          device_id: device.device_id,
+        }),
       });
       if (!response.ok) throw new Error("failed");
-      setDevices((prev) => prev.filter((d) => d.device_id !== device.device_id));
+      setDevices((prev) =>
+        prev.filter((d) => d.device_id !== device.device_id),
+      );
     } catch {
       setError(
         "Could not remove that device. Your session may have expired — request a new recovery email.",
@@ -260,9 +304,23 @@ export default function LicenseManager() {
       {sessionExpiring && (
         <div
           role="status"
-          className="mt-4 border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800"
+          className="mt-4 flex items-center justify-between gap-4 border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800"
         >
-          Session expiring soon — interact with the page to keep it alive.
+          <span>
+            Session expiring soon — interact with the page to keep it alive.
+          </span>
+          {sendLinkState === "sent" ? (
+            <span className="shrink-0 font-bold">Check your email</span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void sendNewLink()}
+              disabled={sendLinkState === "sending"}
+              className="shrink-0 font-bold underline hover:no-underline disabled:cursor-wait disabled:opacity-60"
+            >
+              {sendLinkState === "sending" ? "Sending…" : "Send me a new link"}
+            </button>
+          )}
         </div>
       )}
 

@@ -3,6 +3,15 @@ import { Menu, X } from "lucide-react";
 import GitHubIcon from "./GitHubIcon";
 import GitHubStars from "./GitHubStars";
 
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(
+    new RegExp(
+      `(?:^|;\\s*)${name.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}=([^;]*)`,
+    ),
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 const NAV_LINKS = [
   { label: "Blog", href: "/blog" },
   { label: "Pricing", href: "/pricing" },
@@ -11,11 +20,16 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (mobileMenuRef.current) mobileMenuRef.current.inert = !mobileOpen;
   }, [mobileOpen]);
+
+  useEffect(() => {
+    setLoggedIn(!!getCookie("atelier_auth_token"));
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-[#f7f8fb]/90 backdrop-blur-md transition-all duration-300">
@@ -30,7 +44,7 @@ export default function Nav() {
           </span>
         </a>
 
-        {/* Desktop nav */}
+        {/* Desktop nav links — middle */}
         <div className="hidden items-center gap-6 md:flex">
           {NAV_LINKS.map((link) => (
             <a
@@ -41,22 +55,24 @@ export default function Nav() {
               {link.label}
             </a>
           ))}
-          <div className="flex items-center gap-3">
-            <GitHubStars />
-            <a
-              href="https://github.com/atelier-ws/atelier"
-              className="text-neutral-600 transition hover:text-neutral-950"
-              aria-label="GitHub"
-            >
-              <GitHubIcon size={18} />
-            </a>
-            <a
-              href="#install"
-              className="inline-flex items-center gap-1.5 border border-neutral-950 bg-neutral-950 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-neutral-800"
-            >
-              Install
-            </a>
-          </div>
+        </div>
+
+        {/* Desktop actions — right */}
+        <div className="hidden items-center gap-3 md:flex">
+          <GitHubStars />
+          <a
+            href="https://github.com/atelier-ws/atelier"
+            className="text-neutral-600 transition hover:text-neutral-950"
+            aria-label="GitHub"
+          >
+            <GitHubIcon size={18} />
+          </a>
+          <a
+            href="/account"
+            className="inline-flex items-center gap-1.5 border border-neutral-950 bg-neutral-950 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-neutral-800"
+          >
+            {loggedIn ? "Account" : "Sign in"}
+          </a>
         </div>
 
         {/* Mobile toggle */}
@@ -104,11 +120,11 @@ export default function Nav() {
                 <GitHubIcon size={18} />
               </a>
               <a
-                href="#install"
+                href="/account"
                 className="inline-flex items-center gap-1.5 border border-neutral-950 bg-neutral-950 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-neutral-800"
                 onClick={() => setMobileOpen(false)}
               >
-                Install
+                {loggedIn ? "Account" : "Sign in"}
               </a>
             </div>
           </div>

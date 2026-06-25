@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev --host 0.0.0.0 --port 4321",
+    "dev": "astro build && concurrently --kill-others-on-fail -n astro,wrangler -c cyan,magenta \"nodemon --watch src -e astro,tsx,ts,js,mjs,css,md --exec 'astro build'\" \"wrangler dev --port 4321 --log-level info\"",
     "build": "astro build",
     "preview": "astro preview --host 0.0.0.0 --port 4321",
     "typecheck": "tsc --noEmit",
@@ -23,6 +23,8 @@
     "@types/node": "^26.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "concurrently": "^10.0.3",
+    "nodemon": "^3.1.14",
     "tailwindcss": "^3.4.6",
     "wrangler": "^4.103.0"
   }

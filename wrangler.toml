@@ -30,6 +30,9 @@ PRO_YEARLY_CHECKOUT_URL = "https://buy.stripe.com/test_eVq7sD9zwaGS5i58M8e7m01"
 LICENSE_FROM_EMAIL = "licenses@atelier.ws"
 SENDPULSE_API_ID = "sp_id_ab3a9bd40ae85473359b3c8477296eda"
 SITE_URL = "https://atelier.ws"
+# OAuth app client IDs (public). Secrets go via: wrangler secret put GITHUB_CLIENT_SECRET / GOOGLE_CLIENT_SECRET
+GITHUB_CLIENT_ID = "Ov23liw29ASpAqxgAegJ"
+GOOGLE_CLIENT_ID = "502606534191-m1vqchhhuvvr3g5m3ledd2c0f0ppl6b5.apps.googleusercontent.com"
 
 [observability]
 enabled = true
@@ -39,6 +42,11 @@ head_sampling_rate = 1
 binding = "TELEMETRY_DB"
 database_name = "atelier-telemetry"
 database_id = "7556e5f5-0d3f-4e88-82cc-959bee7d47f5"
+
+[[d1_databases]]
+binding = "AUTH_DB"
+database_name = "atelier-auth"
+database_id = "438ec1e6-9838-4e3e-a7b9-5e2a74b5708b"
 
 [[d1_databases]]
 binding = "LICENSE_DB"

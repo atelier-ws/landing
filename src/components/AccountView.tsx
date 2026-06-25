@@ -247,15 +247,17 @@ function AccountPanel({
     }
   }
 
-  async function openCheckout() {
-    setBusy("checkout");
+  async function openCheckout(billing: "monthly" | "yearly") {
+    setBusy(`checkout-${billing}`);
     try {
       const res = await fetch("/api/account/checkout", {
         method: "POST",
         credentials: "include",
-        headers: sessionToken
-          ? { Authorization: `Bearer ${sessionToken}` }
-          : {},
+        headers: {
+          "Content-Type": "application/json",
+          ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+        },
+        body: JSON.stringify({ billing }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) window.location.href = data.url;
@@ -349,14 +351,25 @@ function AccountPanel({
         </div>
       )}
       {!isPro && (
-        <div className="mt-6">
+        <div className="mt-6 flex items-center gap-4">
           <button
             type="button"
-            onClick={() => void openCheckout()}
-            disabled={busy === "checkout"}
-            className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:opacity-80 disabled:opacity-50"
+            onClick={() => void openCheckout("monthly")}
+            disabled={busy === "checkout-monthly"}
+            className="text-sm font-medium text-brand hover:opacity-80 disabled:opacity-50"
           >
-            {busy === "checkout" ? "Redirecting…" : "Upgrade to Pro →"}
+            {busy === "checkout-monthly" ? "Redirecting…" : "Upgrade monthly →"}
+          </button>
+          <span className="text-neutral-300">or</span>
+          <button
+            type="button"
+            onClick={() => void openCheckout("yearly")}
+            disabled={busy === "checkout-yearly"}
+            className="text-sm font-medium text-neutral-500 hover:text-brand disabled:opacity-50"
+          >
+            {busy === "checkout-yearly"
+              ? "Redirecting…"
+              : "Yearly (save 20%) →"}
           </button>
         </div>
       )}
