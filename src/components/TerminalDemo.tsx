@@ -169,7 +169,7 @@ export default function TerminalDemo() {
       id="terminal"
       className="border-t border-neutral-200 bg-[#f7f8fb] px-6 py-24"
     >
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-600">
             In the terminal
@@ -189,7 +189,7 @@ export default function TerminalDemo() {
             </span>
           </div>
 
-          <div className="flex h-[260px] flex-col justify-end gap-1 overflow-hidden p-4 font-mono text-[11px] leading-relaxed sm:text-xs">
+          <div className="flex h-[340px] flex-col justify-end gap-1 overflow-hidden p-4 font-mono text-[13px] leading-relaxed sm:text-sm">
             {step === 0 && (
               <div className="text-neutral-400">
                 <span className="animate-pulse">✶</span> Working…
@@ -242,7 +242,7 @@ export default function TerminalDemo() {
             )}
           </div>
 
-          <div className="relative mx-3 mb-2 mt-1 rounded border border-neutral-700 border-l-2 border-l-brand/70 bg-[#29292e] px-3 py-2.5 font-mono text-[11px] sm:text-xs">
+          <div className="relative mx-3 mb-2 mt-1 rounded border border-neutral-700 border-l-2 border-l-brand/70 bg-[#29292e] px-3 py-2.5 font-mono text-[13px] sm:text-sm">
             <span className="absolute -top-2.5 right-3 rounded bg-brand/20 px-2 py-0.5 text-[9px] font-bold tracking-wide text-brand-300">
               atelier:code
             </span>
@@ -255,7 +255,7 @@ export default function TerminalDemo() {
             />
           </div>
 
-          <div className="border-t border-neutral-700/70 bg-[#29292e] px-4 py-2 font-mono text-[10px] sm:text-[11px]">
+          <div className="border-t border-neutral-700/70 bg-[#29292e] px-4 py-2 font-mono text-[11px] sm:text-[13px]">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="font-bold text-brand-300">atelier</span>
               <span className="text-neutral-400">|</span>

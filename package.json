@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro build && concurrently --kill-others-on-fail -n astro,wrangler -c cyan,magenta \"nodemon --watch src -e astro,tsx,ts,js,mjs,css,md --exec 'astro build'\" \"wrangler dev --port 4321 --log-level info\"",
+    "dev": "astro build && concurrently --kill-others-on-fail -n astro,wrangler -c cyan,magenta \"nodemon --legacy-watch --watch src -e astro,tsx,ts,js,mjs,css,md --exec 'astro build'\" \"wrangler dev --port 4321 --log-level info\"",
     "build": "astro build",
     "preview": "astro preview --host 0.0.0.0 --port 4321",
     "typecheck": "tsc --noEmit",
