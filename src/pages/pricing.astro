@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav";
-import Pricing from "../components/Pricing";
+import Pricing, { FREE_TIER } from "../components/Pricing";
 import Footer from "../components/Footer";
 
 // FAQ content only — intentionally NO FAQPage schema. Google retired FAQ rich
@@ -9,7 +9,9 @@ import Footer from "../components/Footer";
 const faqs = [
   {
     q: "Is the Free plan actually useful?",
-    a: "Yes. Free is the full local runtime, source-available under the FSL: the complete grounded loop (code search, read, bash, verified edits), the context engine for normal-size repos, single-repo memory, host packaging, and benchmarks. There is no usage cap and no crippled trial.",
+    a: `Yes. Free is the full local runtime, source-available under the FSL: ${FREE_TIER.features
+      .map((f) => f.charAt(0).toLowerCase() + f.slice(1))
+      .join("; ")}. There is no usage cap and no crippled trial.`,
   },
   {
     q: "Does Pro require cloud connectivity?",

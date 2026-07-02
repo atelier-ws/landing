@@ -15,7 +15,7 @@ type SideTier = {
   cta: { label: string; href: string };
 };
 
-const FREE_TIER: SideTier = {
+export const FREE_TIER: SideTier = {
   name: "Free",
   price: "$0",
   blurb: "A grounded coding-agent runtime that runs fully local.",
