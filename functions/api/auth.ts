@@ -346,6 +346,11 @@ async function exchangeGoogle(
   const email = typeof user.email === "string" ? user.email : null;
   const providerId = typeof user.sub === "string" ? user.sub : null;
   if (!email || !providerId) throw new Error("google_user_info_failed");
+  // Google accounts can carry UNVERIFIED non-Gmail addresses. Without this
+  // check, an attacker could register a Google account claiming someone
+  // else's email and inherit the account + plan bridged to it.
+  if (user.email_verified !== true)
+    throw new Error("google_email_not_verified");
 
   return { email, providerId };
 }
