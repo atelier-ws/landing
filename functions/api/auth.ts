@@ -199,6 +199,12 @@ export async function handleOAuthStart(
 
   const state = crypto.randomUUID();
   const expiresAt = isoNow(OAUTH_STATE_TTL_SECONDS);
+  const redirectBase = getRedirectBase(request);
+  // Store the EXACT OAuth callback URI used at authorize time. The token
+  // exchange must send the identical string; re-deriving it from the callback
+  // request's origin can differ (localhost vs 127.0.0.1, dev proxies) and
+  // Google then rejects with redirect_uri_mismatch.
+  const oauthCallback = `${redirectBase}/oauth/callback/${provider}`;
 
   await env.AUTH_DB.prepare(
     `INSERT INTO auth_oauth_states (state, provider, redirect_uri, device_name, cli_redirect, created_at, expires_at)
@@ -207,20 +213,18 @@ export async function handleOAuthStart(
     .bind(
       state,
       provider,
-      redirectUri,
+      oauthCallback,
       deviceName,
       cliRedirect,
       isoNow(),
       expiresAt,
     )
     .run();
-
-  const redirectBase = getRedirectBase(request);
   let oauthUrl: string;
   if (provider === "github") {
     const params = new URLSearchParams({
       client_id: env.GITHUB_CLIENT_ID,
-      redirect_uri: `${redirectBase}/oauth/callback/github`,
+      redirect_uri: oauthCallback,
       scope: "read:user user:email",
       state,
     });
@@ -228,7 +232,7 @@ export async function handleOAuthStart(
   } else {
     const params = new URLSearchParams({
       client_id: env.GOOGLE_CLIENT_ID,
-      redirect_uri: `${redirectBase}/oauth/callback/google`,
+      redirect_uri: oauthCallback,
       response_type: "code",
       scope: "openid email profile",
       state,
@@ -306,7 +310,7 @@ async function exchangeGitHub(
 async function exchangeGoogle(
   code: string,
   env: AuthEnv,
-  redirectBase: string,
+  redirectUri: string, // MUST be byte-identical to the authorize-time redirect_uri
 ): Promise<{ email: string; providerId: string }> {
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -315,7 +319,7 @@ async function exchangeGoogle(
       code,
       client_id: env.GOOGLE_CLIENT_ID,
       client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${redirectBase}/oauth/callback/google`,
+      redirect_uri: redirectUri,
       grant_type: "authorization_code",
     }),
   });
@@ -385,7 +389,12 @@ export async function handleOAuthCallback(
     if (provider === "github") {
       ({ email, providerId } = await exchangeGitHub(code, env, redirectBase));
     } else {
-      ({ email, providerId } = await exchangeGoogle(code, env, redirectBase));
+      // Reuse the stored authorize-time callback URI — never re-derive it.
+      ({ email, providerId } = await exchangeGoogle(
+        code,
+        env,
+        stateRow.redirect_uri,
+      ));
     }
 
     const providerField: "github_id" | "google_id" =
