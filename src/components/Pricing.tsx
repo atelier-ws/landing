@@ -97,13 +97,8 @@ function ProCard() {
 
   return (
     <div className="flex flex-col border border-brand bg-white p-6 shadow-lg ring-1 ring-brand">
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="inline-flex bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
-          Most popular
-        </span>
-        <span className="inline-flex bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
-          3 months free
-        </span>
+      <div className="mb-3 inline-flex self-start bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+        Most popular
       </div>
 
       <div className="text-xs font-bold uppercase tracking-widest text-neutral-500">
@@ -158,10 +153,6 @@ function ProCard() {
           {isYearly ? "/mo · billed $190/yr" : "/mo"}
         </span>
       </div>
-      <p className="mt-1 text-xs font-bold text-emerald-700">
-        Free for 3 months, then {isYearly ? "$190/yr" : "$19/mo"}
-      </p>
-
       <p className="mt-2 text-sm leading-relaxed text-neutral-600">
         The leverage — for one developer on real, large codebases.
       </p>
@@ -183,7 +174,7 @@ function ProCard() {
         href={PRO_LINKS[cadence]}
         className="mt-6 inline-flex items-center justify-center bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-brand-700"
       >
-        Start Free Trial · {isYearly ? "Yearly" : "Monthly"}
+        Get Pro · {isYearly ? "Yearly" : "Monthly"}
       </a>
     </div>
   );
@@ -207,8 +198,7 @@ export default function Pricing() {
             The core runtime is source-available under the FSL and runs on your
             machine alongside Claude Code, Codex, Cursor, and any MCP host. Pro
             unlocks search &amp; indexing at scale, cross-session memory, the
-            savings engine, and model routing. Try Pro free for 3 months — no
-            charge until your trial ends.
+            savings engine, and model routing.
           </p>
         </div>
 
