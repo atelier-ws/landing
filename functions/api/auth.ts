@@ -453,6 +453,22 @@ export async function handleAuthMe(
   const user = await resolveSession(token, env.AUTH_DB);
   if (!user) return json({ error: "unauthorized" }, 401);
 
+  // Plan bridge: a purchase may land AFTER this account/session was created
+  // (buy-then-check flow). While the stored plan is free, re-resolve from the
+  // licenses table so the daily CLI plan check picks the upgrade up without a
+  // re-login.
+  let plan = user.plan;
+  if (plan === "free") {
+    plan = await resolveUserPlan(env.LICENSE_DB, user.email);
+    if (plan !== "free") {
+      await env.AUTH_DB.prepare(
+        `UPDATE auth_users SET plan = ?, updated_at = ? WHERE user_id = ?`,
+      )
+        .bind(plan, isoNow(), user.user_id)
+        .run();
+    }
+  }
+
   // Auto-renew CLI tokens on every use (rolling 24h window)
   const sessionRow = await env.AUTH_DB.prepare(
     `SELECT kind FROM auth_sessions WHERE token = ? LIMIT 1`,
@@ -505,7 +521,7 @@ export async function handleAuthMe(
   return json({
     user_id: user.user_id,
     email: user.email,
-    plan: user.plan,
+    plan,
     device_id: currentDeviceId,
     devices,
     cli_device_count: devices.length,
