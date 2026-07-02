@@ -16,8 +16,7 @@ const escapeXml = (value: string) =>
 export const GET: APIRoute = async () => {
   const posts = await getCollection("blog");
   const newestPostDate = posts.reduce(
-    (latest, post) =>
-      post.data.updated > latest ? post.data.updated : latest,
+    (latest, post) => (post.data.updated > latest ? post.data.updated : latest),
     new Date("2026-06-20T00:00:00.000Z"),
   );
 
@@ -27,7 +26,6 @@ export const GET: APIRoute = async () => {
     { path: "/pricing", lastmod: "2026-06-20" },
     { path: "/privacy", lastmod: "2026-06-20" },
     { path: "/terms", lastmod: "2026-06-20" },
-    { path: "/license/recover", lastmod: "2026-06-21" },
   ];
 
   const postUrls = posts.map((post) => ({

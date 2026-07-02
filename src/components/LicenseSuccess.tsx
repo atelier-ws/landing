@@ -3,15 +3,16 @@ import { useEffect, useState } from "react";
 type State =
   | { status: "loading" }
   | { status: "pending" }
-  | { status: "ready"; licenseKey: string; expiresAt: string | null }
+  | { status: "ready"; email: string; expiresAt: string | null }
   | { status: "error"; message: string };
 
 export default function LicenseSuccess() {
   const [state, setState] = useState<State>({ status: "loading" });
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    const sessionId = new URLSearchParams(window.location.search).get(
+      "session_id",
+    );
     if (!sessionId) {
       setState({
         status: "error",
@@ -39,21 +40,22 @@ export default function LicenseSuccess() {
         }
 
         const body = (await response.json()) as {
-          license_key?: string;
+          email?: string;
+          plan?: string;
           expires_at?: string | null;
           error?: string;
         };
-        if (!response.ok || !body.license_key || body.expires_at === undefined) {
+        if (!response.ok || !body.email || body.expires_at === undefined) {
           throw new Error(
             body.error === "claim_expired"
-              ? "This checkout link has expired. Use license recovery to receive the key again."
-              : "The license is not ready. Check your email or use license recovery.",
+              ? "This checkout link has expired. Sign in on the account page to check your plan."
+              : "The purchase is not ready yet. Sign in on the account page to check your plan.",
           );
         }
 
         setState({
           status: "ready",
-          licenseKey: body.license_key,
+          email: body.email,
           expiresAt: body.expires_at,
         });
       } catch (error) {
@@ -63,7 +65,7 @@ export default function LicenseSuccess() {
             message:
               error instanceof Error
                 ? error.message
-                : "The license could not be loaded.",
+                : "The purchase could not be confirmed.",
           });
         }
       }
@@ -75,15 +77,6 @@ export default function LicenseSuccess() {
     };
   }, []);
 
-  const copyCommand = async () => {
-    if (state.status !== "ready") return;
-    await navigator.clipboard.writeText(
-      `atelier license activate ${state.licenseKey}`,
-    );
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  };
-
   if (state.status === "loading" || state.status === "pending") {
     return (
       <div className="border border-neutral-200 bg-white p-8 text-center">
@@ -91,10 +84,11 @@ export default function LicenseSuccess() {
           Payment received
         </div>
         <h1 className="mt-3 text-2xl font-bold text-neutral-950">
-          Preparing your license…
+          Activating Pro…
         </h1>
         <p className="mt-3 text-sm text-neutral-600">
-          Stripe confirmation can take a few seconds. This page updates automatically.
+          Stripe confirmation can take a few seconds. This page updates
+          automatically.
         </p>
       </div>
     );
@@ -103,13 +97,17 @@ export default function LicenseSuccess() {
   if (state.status === "error") {
     return (
       <div className="border border-neutral-200 bg-white p-8 text-center">
-        <h1 className="text-2xl font-bold text-neutral-950">License unavailable</h1>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-600">{state.message}</p>
+        <h1 className="text-2xl font-bold text-neutral-950">
+          Purchase not confirmed
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+          {state.message}
+        </p>
         <a
-          href="/license/recover"
+          href="/account"
           className="mt-6 inline-flex bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white no-underline"
         >
-          Recover license
+          Go to account
         </a>
       </div>
     );
@@ -120,28 +118,27 @@ export default function LicenseSuccess() {
       <div className="text-xs font-bold uppercase tracking-widest text-brand-700">
         Payment received
       </div>
-      <h1 className="mt-3 text-2xl font-bold text-neutral-950">Your Pro license</h1>
+      <h1 className="mt-3 text-2xl font-bold text-neutral-950">
+        Pro is active for {state.email}
+      </h1>
       <p className="mt-3 text-sm leading-relaxed text-neutral-600">
-        A copy has also been emailed to you. Run this command to activate Pro.
+        Run this command in your terminal and sign in with that same email —
+        your plan attaches to your account automatically.
       </p>
       <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-all border border-neutral-200 bg-neutral-950 p-4 text-left text-xs leading-relaxed text-neutral-100">
-        atelier license activate {state.licenseKey}
+        atelier login
       </pre>
-      <p className="mt-3 text-xs text-neutral-500">
-        After activation, the key is stored at ~/.atelier/license.key.
-      </p>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={copyCommand}
-          className="bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-brand-700"
+        <a
+          href="/account"
+          className="inline-flex bg-brand-600 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white no-underline transition hover:bg-brand-700"
         >
-          {copied ? "Copied" : "Copy activation command"}
-        </button>
+          Manage devices &amp; billing
+        </a>
         <span className="text-xs text-neutral-500">
           {state.expiresAt
             ? `Valid through ${new Date(state.expiresAt).toLocaleDateString()}`
-            : "Lifetime license"}
+            : "Active subscription"}
         </span>
       </div>
     </div>

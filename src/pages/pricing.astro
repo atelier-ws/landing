@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: "Does Pro require cloud connectivity?",
-    a: "Only for activation and periodic license refresh. Atelier enrolls the device once, checks the signed lease locally, and refreshes it automatically every 30 days. A 7-day grace period covers temporary offline use.",
+    a: "Only for sign-in and the periodic plan check. Your plan is cached locally for 24 hours, so normal operation makes at most one auth call a day.",
   },
   {
     q: "What does the savings engine actually do?",
@@ -31,15 +31,15 @@ const faqs = [
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes — cancel any subscription anytime. Existing device leases continue through their current paid and grace period, then Pro features fall back to Free.",
+    a: "Yes — cancel any subscription anytime. Access continues through the current paid period, then Pro features fall back to Free.",
   },
   {
     q: "How many devices can I use?",
-    a: "Pro supports three active devices. If you activate a fourth, the CLI lists your active devices and asks you to remove one first. The replacement activates immediately with no cooldown.",
+    a: "Pro supports three active CLI devices. Manage and remove them from the account page (/account). The replacement activates immediately with no cooldown.",
   },
   {
-    q: "Where do I get my license key after payment?",
-    a: "After Stripe confirms payment, the website displays your Pro license and emails a copy to the checkout address. If you lose it, use the license recovery page to have the current key sent again.",
+    q: "How do I activate Pro after payment?",
+    a: "There is no license key. Pay with the same email you sign in with, then run `atelier login` — the plan attaches to your account automatically. If you paid before signing in, the success page and /account will show Pro active.",
   },
 ];
 ---

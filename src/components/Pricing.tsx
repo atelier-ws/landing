@@ -210,11 +210,10 @@ export default function Pricing() {
         </div>
 
         <p className="mt-8 text-center text-xs text-neutral-600">
-          Use Pro on up to 3 devices. Leases refresh every 30 days with a 7-day
-          offline grace period. Cancel any subscription anytime. Already
+          Use Pro on up to 3 devices. Cancel any subscription anytime. Already
           purchased?{" "}
-          <a href="/license/recover" className="text-brand-700 underline">
-            Recover your license
+          <a href="/account" className="text-brand-700 underline">
+            Manage your account
           </a>
           .
         </p>

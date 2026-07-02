@@ -40,12 +40,6 @@ export default function Footer() {
             Contact
           </a>
           <a
-            href="/license/recover"
-            className="text-neutral-600 no-underline transition hover:text-neutral-950"
-          >
-            Recover license
-          </a>
-          <a
             href="/privacy"
             className="text-neutral-600 no-underline transition hover:text-neutral-950"
           >
