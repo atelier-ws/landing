@@ -31,6 +31,10 @@ run_worker_first = true
 [vars]
 PRO_MONTHLY_CHECKOUT_URL = "replace-with-monthly-stripe-payment-link"
 PRO_YEARLY_CHECKOUT_URL = "replace-with-yearly-stripe-payment-link"
+# Used by the /account in-app upgrade flow (functions/api/license.ts) --
+# normally the same Payment Links as the two above.
+STRIPE_LINK_MONTHLY = "replace-with-monthly-stripe-payment-link"
+STRIPE_LINK_YEARLY = "replace-with-yearly-stripe-payment-link"
 LICENSE_FROM_EMAIL = "licenses@atelier.ws"
 SITE_URL = "https://atelier.ws"
 

@@ -18,6 +18,10 @@ const faqs = [
     a: "Only for sign-in and the periodic plan check. Your plan is cached locally for six hours, so normal operation makes a handful of auth calls a day.",
   },
   {
+    q: "How does the 3-month Pro trial work?",
+    a: "Every new Pro subscription — monthly or yearly — starts with 3 months free. Cancel anytime during the trial from /account and you won't be charged; if you keep it, billing starts automatically at the plan and rate you selected when you signed up.",
+  },
+  {
     q: "What does the savings engine actually do?",
     a: "It tracks tokens, tool calls, context carry, and cost per run, then lets you apply policies to cut waste — and shows a full breakdown of what each session cost and saved.",
   },
@@ -46,7 +50,7 @@ const faqs = [
 
 <Layout
   title="Atelier Pricing: Free, Pro & Enterprise for Claude Code"
-  description="Atelier pricing: Free, Pro ($19/mo), and Enterprise - open-core and local-first. Pro adds large-repo indexing, cross-session memory, and model routing."
+  description="Atelier pricing: Free, Pro ($19/mo, 3 months free), and Enterprise - open-core and local-first. Pro adds large-repo indexing, cross-session memory, and model routing."
   canonicalPath="/pricing"
   breadcrumbs={[
     { name: "Home", path: "/" },

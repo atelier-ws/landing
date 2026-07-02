@@ -2,6 +2,8 @@ const CHECKOUT_CLAIM_TTL_SECONDS = 48 * 60 * 60;
 
 export type LicenseEnv = Env & {
   STRIPE_SECRET_KEY?: string;
+  STRIPE_LINK_MONTHLY?: string;
+  STRIPE_LINK_YEARLY?: string;
 };
 
 type StoredLicense = {
@@ -144,7 +146,8 @@ export async function handleAccountBillingPortal(
   return json({ url: portal.url });
 }
 
-// Payment link URLs — set STRIPE_LINK_MONTHLY / STRIPE_LINK_YEARLY in wrangler secrets
+// Payment link URLs — set STRIPE_LINK_MONTHLY / STRIPE_LINK_YEARLY in wrangler.toml [vars]
+// (same trial-enabled links as PRO_MONTHLY_CHECKOUT_URL / PRO_YEARLY_CHECKOUT_URL).
 const STRIPE_LINK_MONTHLY_DEFAULT =
   "https://buy.stripe.com/test_fZu00bfXU4iufWJ5zWe7m00";
 const STRIPE_LINK_YEARLY_DEFAULT =
@@ -180,11 +183,10 @@ export async function handleAccountCheckout(
     /* default */
   }
 
-  const envAny = env as unknown as Record<string, string>;
   const baseLink =
     billing === "yearly"
-      ? (envAny.STRIPE_LINK_YEARLY ?? STRIPE_LINK_YEARLY_DEFAULT)
-      : (envAny.STRIPE_LINK_MONTHLY ?? STRIPE_LINK_MONTHLY_DEFAULT);
+      ? (env.STRIPE_LINK_YEARLY ?? STRIPE_LINK_YEARLY_DEFAULT)
+      : (env.STRIPE_LINK_MONTHLY ?? STRIPE_LINK_MONTHLY_DEFAULT);
 
   const url = new URL(baseLink);
   url.searchParams.set("prefilled_email", sessionRow.email);
