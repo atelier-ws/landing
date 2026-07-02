@@ -20,6 +20,8 @@ export type AuthEnv = Env & {
   GOOGLE_CLIENT_SECRET: string;
   AUTH_DB: D1Database; // atelier-auth: users, sessions, oauth states, email logins
   LICENSE_DB: D1Database; // atelier-licenses: subscriptions (plan bridge, read-only)
+  DEV_ORIGIN?: string; // local dev only: true browser origin (wrangler dev reports the
+  // custom-domain host in request.url and rewrites Location headers, so url.origin lies)
 };
 
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days
@@ -199,7 +201,7 @@ export async function handleOAuthStart(
 
   const state = crypto.randomUUID();
   const expiresAt = isoNow(OAUTH_STATE_TTL_SECONDS);
-  const redirectBase = getRedirectBase(request);
+  const redirectBase = env.DEV_ORIGIN?.trim() || getRedirectBase(request);
   // Store the EXACT OAuth callback URI used at authorize time. The token
   // exchange must send the identical string; re-deriving it from the callback
   // request's origin can differ (localhost vs 127.0.0.1, dev proxies) and
