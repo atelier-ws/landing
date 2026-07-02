@@ -321,7 +321,17 @@ async function exchangeGoogle(
   });
   const tokenData = (await tokenRes.json()) as Record<string, unknown>;
   const accessToken = tokenData.access_token as string;
-  if (!accessToken) throw new Error("google_token_exchange_failed");
+  if (!accessToken) {
+    // Most common cause: the auth code was already consumed (callback URL
+    // reloaded) or expired — Google reports invalid_grant for both.
+    console.error(
+      "[google_token_exchange] response:",
+      JSON.stringify(tokenData),
+    );
+    throw new Error(
+      `google_token_exchange_failed: ${JSON.stringify(tokenData)}`,
+    );
+  }
 
   const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
     headers: { Authorization: `Bearer ${accessToken}` },
