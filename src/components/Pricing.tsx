@@ -20,7 +20,7 @@ const FREE_TIER: SideTier = {
   price: "$0",
   blurb: "A grounded coding-agent runtime that runs fully local.",
   features: [
-    "Code-nav MCP tools — read, grep, search, edit",
+    "The full grounded loop — code search, read, bash, verified edits",
     "Repo map + context engine for normal-size repos",
     "Single-repo memory, host packaging, benchmarks",
     "See how much you'd save",
