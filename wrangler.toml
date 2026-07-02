@@ -25,8 +25,8 @@ html_handling = "drop-trailing-slash"
 run_worker_first = true
 
 [vars]
-PRO_MONTHLY_CHECKOUT_URL = "https://buy.stripe.com/test_fZu00bfXU4iufWJ5zWe7m00"
-PRO_YEARLY_CHECKOUT_URL = "https://buy.stripe.com/test_eVq7sD9zwaGS5i58M8e7m01"
+PRO_MONTHLY_CHECKOUT_URL = "https://buy.stripe.com/eVq7sD9zwaGS5i58M8e7m01"
+PRO_YEARLY_CHECKOUT_URL = "https://buy.stripe.com/fZu00bfXU4iufWJ5zWe7m00"
 LICENSE_FROM_EMAIL = "licenses@atelier.ws"
 SENDPULSE_API_ID = "sp_id_ab3a9bd40ae85473359b3c8477296eda"
 SITE_URL = "https://atelier.ws"
